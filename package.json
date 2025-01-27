@@ -1,6 +1,6 @@
 {
   "name": "@neo4j-labs/experimental-query-api-wrapper",
-  "version": "0.0.1-alpha06",
+  "version": "0.0.1-alpha07",
   "description": "Experimental wrapper library to access Neo4j Database using Query API with a neo4j-driver-like interface.",
   "main": "lib/index.js",
   "types": "types/index.d.ts",
@@ -18,7 +18,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/neo4j/neo4j-javascript-driver.git"
+    "url": "git://github.com/neo4j-drivers/experimental-query-api-wrapper.git"
   },
   "keywords": [
     "http",
@@ -26,11 +26,14 @@
     "driver"
   ],
   "author": "Antonio Barcélos",
+  "contributors": [{
+    "name": "Max Gustafsson"
+  }],
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/neo4j/neo4j-javascript-driver/issues"
+    "url": "https://github.com/neo4j-drivers/experimental-query-api-wrapper/issues"
   },
-  "homepage": "https://github.com/neo4j/neo4j-javascript-driver#readme",
+  "homepage": "https://github.com/neo4j-drivers/experimental-query-api-wrapper#readme",
   "devDependencies": {
     "@types/jest": "^29.5.3",
     "downdoc": "^1.0.2-stable",
@@ -42,7 +45,7 @@
     "typescript": "^4.9.5"
   },
   "dependencies": {
-    "neo4j-driver-core": "^5.26.0"
+    "neo4j-driver-core": "^5.28.0"
   },
   "engines": {
     "node": ">=18.0.0"
