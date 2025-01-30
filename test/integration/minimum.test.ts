@@ -248,7 +248,7 @@ when(config.version >= 5.23, () => describe.each(runners())('minimum requirement
     }
   })
 
-  it('should be able to return ResultSummary.plan', async () => {
+  it('should be able to return ResultSummary.plan when PROFILE', async () => {
     for await (const session of withSession({ database: config.database })) {
       const { summary} = await runner(session, 'PROFILE RETURN 1')
 
@@ -288,6 +288,43 @@ when(config.version >= 5.23, () => describe.each(runners())('minimum requirement
         "DbHits": int(0),
         "Rows": int(1),
         "PageCacheHits": int(0)
+      })
+
+      expect(child.children.length).toBe(0)
+    }
+  })
+
+  it('should be able to return ResultSummary.plan when EXPLAIN', async () => {
+    for await (const session of withSession({ database: config.database })) {
+      const { summary} = await runner(session, 'EXPLAIN RETURN 1')
+
+      expect(summary.plan).not.toBe(false)
+      
+      const plan: Plan = summary.plan as Plan
+      expect(plan.identifiers).toEqual(['`1`'])
+      expect(plan.operatorType).toEqual('ProduceResults@neo4j')
+      expect(plan.arguments).toMatchObject({
+        "planner-impl": "IDP",
+        "runtime": "PIPELINED",
+        "runtime-impl": "PIPELINED",
+        "batch-size": int(128),
+        "Details": "`1`",
+        "PipelineInfo": "Fused in Pipeline 0",
+        "Id": int(0),
+        "EstimatedRows": 1.0,
+        "planner": "COST"
+      })
+
+      expect(plan.children.length).toBe(1)
+      
+      const [child] = plan.children
+      expect(child.identifiers).toEqual(['`1`'])
+      expect(child.operatorType).toEqual('Projection@neo4j')
+      expect(child.arguments).toEqual({
+        "Details": "$autoint_0 AS `1`",
+        "PipelineInfo": "Fused in Pipeline 0",
+        "Id": int(1),
+        "EstimatedRows": 1.0,
       })
 
       expect(child.children.length).toBe(0)
@@ -349,6 +386,14 @@ when(config.version >= 5.23, () => describe.each(runners())('minimum requirement
       })
 
       expect(child.children.length).toEqual(0)
+    }
+  })
+
+  it('should be not return ResultSummary.profile when EXPLAIN',async () => {
+    for await (const session of withSession({ database: config.database })) {
+      const { summary} = await runner(session, 'EXPLAIN RETURN 1')
+
+      expect(summary.profile).toBe(false)
     }
   })
 
