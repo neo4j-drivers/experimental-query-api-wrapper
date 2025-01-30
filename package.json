@@ -26,9 +26,11 @@
     "driver"
   ],
   "author": "Antonio Barcélos",
-  "contributors": [{
-    "name": "Max Gustafsson"
-  }],
+  "contributors": [
+    {
+      "name": "Max Gustafsson"
+    }
+  ],
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/neo4j-drivers/experimental-query-api-wrapper/issues"

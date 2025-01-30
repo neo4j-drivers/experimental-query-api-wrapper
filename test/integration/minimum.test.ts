@@ -253,7 +253,7 @@ when(config.version >= 5.23, () => describe.each(runners())('minimum requirement
       const { summary} = await runner(session, 'PROFILE RETURN 1')
 
       expect(summary.plan).not.toBe(false)
-      
+
       const plan: Plan = summary.plan as Plan
       expect(plan.identifiers).toEqual(['`1`'])
       expect(plan.operatorType).toEqual('ProduceResults@neo4j')
@@ -347,6 +347,56 @@ when(config.version >= 5.23, () => describe.each(runners())('minimum requirement
         "Rows": int(1),
         "PageCacheHits": int(0)
       })
+
+      expect(child.children.length).toEqual(0)
+    }
+  })
+
+  it('should be able to return ResultSummary.plan', async () => {
+    for await (const session of withSession({ database: config.database })) {
+      const { summary} = await runner(session, 'EXPLAIN RETURN 1')
+
+      expect(summary.plan).not.toBe(false)
+      
+      const plan: Plan = summary.plan as Plan
+      expect(plan.identifiers).toEqual(['`1`'])
+      expect(plan.operatorType).toEqual('ProduceResults@neo4j')
+
+      expect(plan.children.length).toBe(1)
+      
+      const [child] = plan.children
+      expect(child.identifiers).toEqual(['`1`'])
+      expect(child.operatorType).toEqual('Projection@neo4j')
+
+      expect(child.children.length).toBe(0)
+    }
+  })
+
+  it('should be able to return ResultSummary.profile',async () => {
+    for await (const session of withSession({ database: config.database })) {
+      const { summary} = await runner(session, 'EXPLAIN RETURN 1')
+
+      expect(summary.profile).not.toBe(false)
+      
+      const profile: ProfiledPlan = summary.profile as ProfiledPlan
+      expect(profile.dbHits).toEqual(0)
+      expect(profile.identifiers).toEqual(['`1`'])
+      expect(profile.operatorType).toEqual('ProduceResults@neo4j')
+      expect(profile.pageCacheHitRatio).toEqual(0.0)
+      expect(profile.pageCacheHits).toEqual(0)
+      expect(profile.pageCacheMisses).toEqual(0)
+      expect(profile.time).toEqual(0)
+
+      expect(profile.children.length).toEqual(1)
+
+      const [child] = profile.children
+      expect(child.dbHits).toEqual(0)
+      expect(child.identifiers).toEqual(['`1`'])
+      expect(child.operatorType).toEqual('Projection@neo4j')
+      expect(child.pageCacheHitRatio).toEqual(0.0)
+      expect(child.pageCacheHits).toEqual(0)
+      expect(child.pageCacheMisses).toEqual(0)
+      expect(child.time).toEqual(0)
 
       expect(child.children.length).toEqual(0)
     }

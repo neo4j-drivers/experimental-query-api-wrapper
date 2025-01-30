@@ -110,6 +110,7 @@ export type RawQuerySuccessResponse = {
     counters: Counters
     bookmarks: string[]
     profiledQueryPlan?: ProfiledQueryPlan
+    queryPlan?: ProfiledQueryPlan
     notifications?: NotificationShape[]
     [str: string]: unknown
 }
@@ -197,11 +198,17 @@ class QuerySuccessResponseCodec extends QueryResponseCodec {
     }
 
     get meta(): Record<string, unknown> {
+        let profile = null
+        if (this._response.profiledQueryPlan != null) {
+            profile = this._decodeProfile(this._response.profiledQueryPlan)
+        }
+        else if (this._response.queryPlan != null) {
+            profile = this._decodeProfile(this._response.queryPlan)
+        }
         return {
             bookmark: this._response.bookmarks,
             stats: this._decodeStats(this._response.counters),
-            profile: this._response.profiledQueryPlan != null ?
-                this._decodeProfile(this._response.profiledQueryPlan) : null,
+            profile: profile,
             notifications: this._response.notifications
         }
     }
