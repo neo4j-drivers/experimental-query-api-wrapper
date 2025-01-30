@@ -372,7 +372,7 @@ when(config.version >= 5.23, () => describe.each(runners())('minimum requirement
     }
   })
 
-  it('should be able to return ResultSummary.profile',async () => {
+  it('should not return ResultSummary.profile when EXPLAIN',async () => {
     for await (const session of withSession({ database: config.database })) {
       const { summary} = await runner(session, 'EXPLAIN RETURN 1')
 
