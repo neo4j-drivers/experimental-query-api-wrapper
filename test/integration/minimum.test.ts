@@ -253,7 +253,7 @@ when(config.version >= 5.23, () => describe.each(runners())('minimum requirement
       const { summary} = await runner(session, 'PROFILE RETURN 1')
 
       expect(summary.plan).not.toBe(false)
-      
+
       const plan: Plan = summary.plan as Plan
       expect(plan.identifiers).toEqual(['`1`'])
       expect(plan.operatorType).toEqual('ProduceResults@neo4j')
@@ -349,6 +349,34 @@ when(config.version >= 5.23, () => describe.each(runners())('minimum requirement
       })
 
       expect(child.children.length).toEqual(0)
+    }
+  })
+
+  it('should be able to return ResultSummary.plan when EXPLAIN', async () => {
+    for await (const session of withSession({ database: config.database })) {
+      const { summary} = await runner(session, 'EXPLAIN RETURN 1')
+
+      expect(summary.plan).not.toBe(false)
+      
+      const plan: Plan = summary.plan as Plan
+      expect(plan.identifiers).toEqual(['`1`'])
+      expect(plan.operatorType).toEqual('ProduceResults@neo4j')
+
+      expect(plan.children.length).toBe(1)
+      
+      const [child] = plan.children
+      expect(child.identifiers).toEqual(['`1`'])
+      expect(child.operatorType).toEqual('Projection@neo4j')
+
+      expect(child.children.length).toBe(0)
+    }
+  })
+
+  it('should not return ResultSummary.profile when EXPLAIN',async () => {
+    for await (const session of withSession({ database: config.database })) {
+      const { summary} = await runner(session, 'EXPLAIN RETURN 1')
+
+      expect(summary.profile).toBe(false)
     }
   })
 
