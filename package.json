@@ -25,10 +25,13 @@
     "neo4j",
     "driver"
   ],
-  "author": "Antonio Barcélos",
+  "author": "Neo4j",
   "contributors": [
     {
       "name": "Max Gustafsson"
+    },
+    {
+      "name": "Antonio Barcélos"
     }
   ],
   "license": "Apache-2.0",
