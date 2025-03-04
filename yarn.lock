@@ -2120,10 +2120,10 @@
   "resolved" "https://registry.npmjs.org/natural-compare/-/natural-compare-1.4.0.tgz"
   "version" "1.4.0"
 
-"neo4j-driver-core@^5.27.0":
-  "integrity" "sha512-TXZLNjtLrySRyBPBiRkQ/Ewmt4PQG0rm/Q2ZPNPqxbq1S0UVd53PQ2N6jxKiWlkrlPfrVRd2DyE8M7X9MDXxZw=="
-  "resolved" "https://registry.npmjs.org/neo4j-driver-core/-/neo4j-driver-core-5.27.0.tgz"
-  "version" "5.27.0"
+"neo4j-driver-core@^5.28.1":
+  "integrity" "sha512-14vN8TlxC0JvJYfjWic5PwjsZ38loQLOKFTXwk4fWLTbCk6VhrhubB2Jsy9Rz+gM6PtTor4+6ClBEFDp1q/c8g=="
+  "resolved" "https://registry.npmjs.org/neo4j-driver-core/-/neo4j-driver-core-5.28.1.tgz"
+  "version" "5.28.1"
 
 "node-int64@^0.4.0":
   "integrity" "sha512-O5lz91xSOeoXP6DulyHfllpq+Eg00MWitZIbtPfoSEvqIHdl5gfcY6hYzDWnj0qD5tz52PI08u9qUvSVeUBeHw=="
