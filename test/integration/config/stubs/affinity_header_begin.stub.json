@@ -1,0 +1,40 @@
+{
+    "request": {
+            "method": "POST",
+            "url": "/db/neo4j/query/v2/tx",
+            "headers": {
+                "Content-Type": {
+                    "equalTo": "application/json"
+            },
+            "Accept": {
+                "equalTo": "application/vnd.neo4j.query, application/json"
+            },
+            "Authorization": {
+                "equalTo": "Bearer bmljZXN0VG9rZW5FdmVy"
+            }
+        },
+        "bodyPatterns": [
+            {
+                "equalToJson": {
+                    "accessMode": "WRITE"
+                }
+            }
+        ]
+    },
+    "response": {
+        "status": 202,
+        "body": {
+            "bookmarks": [  
+                "FB:kcwQ/wTfJf8rS1WY+GiIKXsCXgmQ"
+            ],
+            "transaction": {  
+                "id": "lyU",
+                "expires": "2024-10-22T15:48:29Z"
+            }
+        },
+        "headers": {
+            "Content-Type": "application/vnd.neo4j.query",
+            "neo4j-cluster-affinity": "123abc"
+        }
+    }
+}
