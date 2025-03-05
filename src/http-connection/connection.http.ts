@@ -101,8 +101,9 @@ export default class HttpConnection extends Connection {
 
             const res = await fetch(request.url, request)
             const { body: rawQueryResponse, headers: [contentType] } = await readBodyAndReaders<RawQueryResponse>(request.url, res, 'content-type')
-            
-            this._log?.debug(`${this} ${JSON.stringify(rawQueryResponse)}`)
+            let headers = ""
+            res.headers.forEach((value, header) => headers += `\nHeader: ${header} Value: ${value}`)
+            this._log?.debug(`${this} ${JSON.stringify(rawQueryResponse)} ${headers}`);
             const batchSize = config?.fetchSize ?? Number.MAX_SAFE_INTEGER
             const codec = QueryResponseCodec.of(this._config, contentType ?? '', rawQueryResponse);
 
@@ -191,7 +192,9 @@ export default class HttpConnection extends Connection {
                 headers: [contentType, affinity]
             } = await readBodyAndReaders<RawBeginTransactionResponse>(request.url, res, 'content-type', this._sessionAffinityHeader)
 
-            this._log?.debug(`${this} ${JSON.stringify(rawBeginTransactionResponse)}`)
+            let headers = ""
+            res.headers.forEach((value, header) => headers += `\nHeader: ${header} Value: ${value}`)
+            this._log?.debug(`${this} ${JSON.stringify(rawBeginTransactionResponse)} ${headers} `);
             
             const codec = BeginTransactionResponseCodec.of(this._config, contentType ?? '', rawBeginTransactionResponse);
 
@@ -255,7 +258,9 @@ export default class HttpConnection extends Connection {
                 headers: [contentType]
             } = await readBodyAndReaders<RawCommitTransactionResponse>(request.url, res, 'contentType')
 
-            this._log?.debug(`${this} ${JSON.stringify(rawCommitTransactionResponse)}`)
+            let headers = ""
+            res.headers.forEach((value, header) => headers += `\nHeader: ${header} Value: ${value}`)
+            this._log?.debug(`${this} ${JSON.stringify(rawCommitTransactionResponse)} ${headers}`);
             
             const codec = CommitTransactionResponseCodec.of(this._config, contentType ?? '', rawCommitTransactionResponse);
 
@@ -311,7 +316,9 @@ export default class HttpConnection extends Connection {
                 ]
             } = await readBodyAndReaders<RawRollbackTransactionResponse>(request.url, res, 'content-type')
 
-            this._log?.debug(`${this} ${JSON.stringify(rawRollbackTransactionResponse)}`)
+            let headers = ""
+            res.headers.forEach((value, header) => headers += `\nHeader: ${header} Value: ${value}`)
+            this._log?.debug(`${this} ${headers} ${JSON.stringify(rawRollbackTransactionResponse)}`);
             
             const codec = RollbackTransactionResponseCodec.of(this._config, contentType ?? '', rawRollbackTransactionResponse);
 
