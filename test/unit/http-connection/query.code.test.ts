@@ -148,12 +148,12 @@ describe('QueryRequestCodec', () => {
             ['Null', v(null, { $type: 'Null', _value: null })],
             ['Boolean', v(true, { $type: 'Boolean', _value: true })],
             ['Integer', v(int(123), { $type: 'Integer', _value: '123' })],
-            ['BigInt', v(-1234n, { $type: 'Integer', _value: '-1234' })],
+            ['BigInt', v(BigInt(-1234), { $type: 'Integer', _value: '-1234' })],
             ['Float', v(-1234, { $type: 'Float', _value: '-1234' })],
             ['String', v('Hello, Greg!', { $type: 'String', _value: 'Hello, Greg!' })],
             ['ByteArray', v(new Uint8Array([0x60, 0x60, 0xB0, 0x17]), { $type: 'Base64', _value: 'YGCwFw==' })],
-            ['List', v(['A', 12n], { $type: 'List', _value: [{ $type: 'String', _value: 'A' }, { $type: 'Integer', _value: '12' }] })],
-            ['Iterable', v(new Set(['A', 12n]), { $type: 'List', _value: [{ $type: 'String', _value: 'A' }, { $type: 'Integer', _value: '12' }] })],
+            ['List', v(['A', BigInt(12)], { $type: 'List', _value: [{ $type: 'String', _value: 'A' }, { $type: 'Integer', _value: '12' }] })],
+            ['Iterable', v(new Set(['A', BigInt(12)]), { $type: 'List', _value: [{ $type: 'String', _value: 'A' }, { $type: 'Integer', _value: '12' }] })],
             ['Map', v({ a: 'b', c: ['d'] }, { $type: 'Map', _value: { a: { $type: 'String', _value: 'b' }, c: { $type: 'List', _value: [{ $type: 'String', _value: 'd' }] } } })],
             ['Date', v(new Date(1988, 8, 23), { $type: 'Date', _value: '1988-08-23' })],
             ['Time', v(new Time(12, 50, 35, 556000000, 3600), { $type: 'Time', _value: '12:50:35.556000000+01:00' })],
@@ -480,26 +480,26 @@ describe('QueryResponseCodec', () => {
                     systemUpdates: 13232
                 }, {
                     containsUpdates: true,
-                    nodesCreated: 12n,
-                    nodesDeleted: 45n,
-                    propertiesSet: -1n,
-                    relationshipsCreated: 234n,
-                    relationshipsDeleted: 2n,
-                    labelsAdded: 5n,
-                    labelsRemoved: 2n,
-                    indexesAdded: 312334n,
-                    indexesRemoved: 1n,
-                    constraintsAdded: 2198392n,
-                    constraintsRemoved: 3232n,
+                    nodesCreated: BigInt(12),
+                    nodesDeleted: BigInt(45),
+                    propertiesSet: BigInt(-1),
+                    relationshipsCreated: BigInt(234),
+                    relationshipsDeleted: BigInt(2),
+                    labelsAdded: BigInt(5),
+                    labelsRemoved: BigInt(2),
+                    indexesAdded: BigInt(312334),
+                    indexesRemoved: BigInt(1),
+                    constraintsAdded: BigInt(2198392),
+                    constraintsRemoved: BigInt(3232),
                     containsSystemUpdates: false,
-                    systemUpdates: 13232n
+                    systemUpdates: BigInt(13232)
                 }, config],
                 [{
-                    madeUpStuff: 123n,
+                    madeUpStuff: BigInt(123),
                     nodesDeleted: "234"
                 },
                 {
-                    madeUpStuff: 123n,
+                    madeUpStuff: BigInt(123),
                     nodesDeleted: "234"
                 }, config]])
             ,
