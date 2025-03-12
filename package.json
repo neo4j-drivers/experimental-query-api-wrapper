@@ -47,7 +47,8 @@
     "testcontainers": "^8.16.0",
     "ts-jest": "^29.1.1",
     "ts-node": "10.9.2",
-    "typescript": "^4.9.5"
+    "typescript": "^4.9.5",
+    "yarn": "^1.22.22"
   },
   "dependencies": {
     "neo4j-driver-core": "^5.28.1"

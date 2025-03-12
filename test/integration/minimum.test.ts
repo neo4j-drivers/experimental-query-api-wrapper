@@ -127,12 +127,12 @@ when(config.version >= 5.23, () => describe.each(runners())('minimum requirement
     ['Integer', v(int(2147483647))],
     ['Integer', v(int(-2147483648))],
     // bigint
-    ['bigint', v(1n, int)],
-    ['bigint', v(-7n, int)],
-    ['bigint', v(-129n, int)],
-    ['bigint', v(129n, int)],
-    ['bigint', v(2147483647n, int)],
-    ['bigint', v(-2147483648n, int)],
+    ['bigint', v(BigInt(1), int)],
+    ['bigint', v(BigInt(-7), int)],
+    ['bigint', v(BigInt(-129), int)],
+    ['bigint', v(BigInt(129), int)],
+    ['bigint', v(BigInt(2147483647), int)],
+    ['bigint', v(BigInt(-2147483648), int)],
     // number
     ['number', v(0)],
     ['number', v(0.0)],
