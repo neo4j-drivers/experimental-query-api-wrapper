@@ -12,7 +12,7 @@
             "Authorization": {
                 "equalTo": "Bearer bmljZXN0VG9rZW5FdmVy"
             },
-            "neo4j-cluster-affinity": {
+            "Neo4j-Cluster-Affinity": {
                 "equalTo": "123abc"
             }
         },
@@ -22,7 +22,7 @@
         "status": 202,
         "headers": {
             "Content-Type": "application/vnd.neo4j.query",
-            "neo4j-cluster-affinity": "123abc"
+            "Neo4j-Cluster-Affinity": "123abc"
         }
     }
 }

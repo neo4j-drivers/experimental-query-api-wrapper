@@ -1,10 +1,10 @@
 {
     "request": {
-            "method": "POST",
-            "url": "/db/neo4j/query/v2/tx",
-            "headers": {
-                "Content-Type": {
-                    "equalTo": "application/json"
+        "method": "POST",    
+        "url": "/db/neo4j/query/v2/tx",
+        "headers": {
+            "Content-Type": {
+                "equalTo": "application/json"
             },
             "Accept": {
                 "equalTo": "application/vnd.neo4j.query, application/json"
@@ -34,7 +34,7 @@
         },
         "headers": {
             "Content-Type": "application/vnd.neo4j.query",
-            "neo4j-cluster-affinity": "123abc"
+            "Neo4j-Cluster-Affinity": "123abc"
         }
     }
 }
