@@ -2120,7 +2120,7 @@ natural-compare@^1.4.0:
   resolved "https://registry.npmjs.org/natural-compare/-/natural-compare-1.4.0.tgz"
   integrity sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==
 
-neo4j-driver-core@^5.27.0:
+neo4j-driver-core@^5.28.1:
   version "5.28.1"
   resolved "https://registry.npmjs.org/neo4j-driver-core/-/neo4j-driver-core-5.28.1.tgz"
   integrity sha512-14vN8TlxC0JvJYfjWic5PwjsZ38loQLOKFTXwk4fWLTbCk6VhrhubB2Jsy9Rz+gM6PtTor4+6ClBEFDp1q/c8g==

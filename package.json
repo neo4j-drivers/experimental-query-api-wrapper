@@ -51,7 +51,7 @@
     "yarn": "^1.22.22"
   },
   "dependencies": {
-    "neo4j-driver-core": "^5.27.0"
+    "neo4j-driver-core": "^5.28.1"
   },
   "engines": {
     "node": ">=18.0.0"

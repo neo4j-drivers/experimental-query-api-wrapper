@@ -1,0 +1,73 @@
+{
+    "request": {
+        "method": "POST",
+        "url": "/db/neo4j/query/v2/tx/lyU",
+        "headers": {
+            "Content-Type": {
+                "equalTo": "application/vnd.neo4j.query"
+            },
+            "Accept": {
+                "equalTo": "application/vnd.neo4j.query, application/json"
+            },
+            "Authorization": {
+                "equalTo": "Bearer bmljZXN0VG9rZW5FdmVy"
+            },
+            "Neo4j-Cluster-Affinity": {
+                "equalTo": "123abc"
+            }
+        },
+        "bodyPatterns": [
+            {
+                "equalToJson": {
+                    "statement": "RETURN 1 as a",
+                    "includeCounters": true
+                }
+            }
+        ]
+    },
+    "response": {
+        "status": 202,
+        "body": {
+            "data": {
+                "fields": [
+                    "a"
+                ],
+                "values": [
+                    [
+                        {
+                            "$type": "Integer",
+                            "_value": "1"
+                        }
+                    ]
+                ]
+            },
+            "counters": {
+                "containsUpdates": true,
+                "nodesCreated": 1,
+                "nodesDeleted": 0,
+                "propertiesSet": 1,
+                "relationshipsCreated": 0,
+                "relationshipsDeleted": 0,
+                "labelsAdded": 1,
+                "labelsRemoved": 0,
+                "indexesAdded": 0,
+                "indexesRemoved": 0,
+                "constraintsAdded": 0,
+                "constraintsRemoved": 0,
+                "containsSystemUpdates": false,
+                "systemUpdates": 0
+            },
+            "bookmarks": [  
+                "FB:kcwQ/wTfJf8rS1WY+GiIKXsCXgmQ"
+            ],
+            "transaction": {  
+                "id": "lyU",
+                "expires": "2024-10-22T15:48:29Z"
+            }
+        },
+        "headers": {
+            "Content-Type": "application/vnd.neo4j.query",
+            "Neo4j-Cluster-Affinity": "123abc"
+        }
+    }
+}

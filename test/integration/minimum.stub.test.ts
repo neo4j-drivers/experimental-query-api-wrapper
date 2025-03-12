@@ -84,4 +84,58 @@ describe('minimum requirements stub', () => {
         }
     })
 
+    it('should support cluster affinity header', async () => {
+        localMocks.push(
+            await config.loadWireMockStub('affinity_header_begin'),
+            await config.loadWireMockStub('affinity_header_return_1')
+        )
+
+        const wrapper = neo4j.wrapper(
+            `http://${config.hostname}:${config.wireMockPort}`,
+            neo4j.auth.bearer('nicestTokenEver')
+        )
+
+        for await (const session of withSession(wrapper, { database: 'neo4j' })) {
+            let tx = session.beginTransaction()
+            await expect(tx).resolves.toBeDefined()
+            await expect(tx.run("RETURN 1 as a")).resolves.toBeDefined()
+        }
+    })
+
+    it('should support cluster affinity header with execute write', async () => {
+        localMocks.push(
+            await config.loadWireMockStub('affinity_header_begin'),
+            await config.loadWireMockStub('affinity_header_return_1'),
+            await config.loadWireMockStub('affinity_header_commit')
+        )
+
+        const wrapper = neo4j.wrapper(
+            `http://${config.hostname}:${config.wireMockPort}`,
+            neo4j.auth.bearer('nicestTokenEver')
+        )
+
+        for await (const session of withSession(wrapper, { database: 'neo4j' })) {
+            let tx = session.executeWrite((tx) => {
+                return tx.run("RETURN 1 as a")
+            })
+            await expect(tx).resolves.toBeDefined()
+        }
+    })
+
+    it('should support cluster affinity header with executeQuery', async () => {
+        localMocks.push(
+            await config.loadWireMockStub('affinity_header_begin_read'),
+            await config.loadWireMockStub('affinity_header_return_1'),
+            await config.loadWireMockStub('affinity_header_commit')
+        )
+
+        const wrapper = neo4j.wrapper(
+            `http://${config.hostname}:${config.wireMockPort}`,
+            neo4j.auth.bearer('nicestTokenEver'),
+            {
+                logging: {level: 'debug', logger: (msg, lvl) => console.log(msg, lvl)}
+            }
+        )
+        await expect(wrapper.executeQuery("RETURN 1 as a", {}, {database: "neo4j", routing: 'READ'})).resolves.toBeDefined()
+    })
 })
