@@ -54,9 +54,9 @@ describe('BeginTransactionRequestCodec', () => {
     describe('.authorization', () => {
         it.each([
             ['Basic', auth.basic('myuser', 'mypassword'), 'Basic bXl1c2VyOm15cGFzc3dvcmQ='],
-            ['Bearer', auth.bearer('mytoken'), 'Bearer bXl0b2tlbg=='],
+            ['Bearer', auth.bearer('mytoken'), 'Bearer mytoken'],
             ['Custom Basic', auth.custom('myuser', 'mypassword', '', 'basic'), 'Basic bXl1c2VyOm15cGFzc3dvcmQ='],
-            ['Custom Bearer', auth.custom('', 'mytoken', '', 'bearer'), 'Bearer bXl0b2tlbg=='],
+            ['Custom Bearer', auth.custom('', 'mytoken', '', 'bearer'), 'Bearer mytoken'],
         ])('should handle %s', (_, auth, expected) => {
             const codec = subject({ auth })
 
@@ -283,9 +283,9 @@ describe('CommitTransactionRequestCodec', () => {
     describe('.authorization', () => {
         it.each([
             ['Basic', auth.basic('myuser', 'mypassword'), 'Basic bXl1c2VyOm15cGFzc3dvcmQ='],
-            ['Bearer', auth.bearer('mytoken'), 'Bearer bXl0b2tlbg=='],
+            ['Bearer', auth.bearer('mytoken'), 'Bearer mytoken'],
             ['Custom Basic', auth.custom('myuser', 'mypassword', '', 'basic'), 'Basic bXl1c2VyOm15cGFzc3dvcmQ='],
-            ['Custom Bearer', auth.custom('', 'mytoken', '', 'bearer'), 'Bearer bXl0b2tlbg=='],
+            ['Custom Bearer', auth.custom('', 'mytoken', '', 'bearer'), 'Bearer mytoken'],
         ])('should handle %s', (_, auth, expected) => {
             const codec = subject({ auth })
 
@@ -440,9 +440,9 @@ describe('RollbackTransactionRequestCodec', () => {
     describe('.authorization', () => {
         it.each([
             ['Basic', auth.basic('myuser', 'mypassword'), 'Basic bXl1c2VyOm15cGFzc3dvcmQ='],
-            ['Bearer', auth.bearer('mytoken'), 'Bearer bXl0b2tlbg=='],
+            ['Bearer', auth.bearer('mytoken'), 'Bearer mytoken'],
             ['Custom Basic', auth.custom('myuser', 'mypassword', '', 'basic'), 'Basic bXl1c2VyOm15cGFzc3dvcmQ='],
-            ['Custom Bearer', auth.custom('', 'mytoken', '', 'bearer'), 'Bearer bXl0b2tlbg=='],
+            ['Custom Bearer', auth.custom('', 'mytoken', '', 'bearer'), 'Bearer mytoken'],
         ])('should handle %s', (_, auth, expected) => {
             const codec = subject({ auth })
 
