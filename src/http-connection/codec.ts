@@ -24,7 +24,7 @@ export const NEO4J_QUERY_CONTENT_TYPE = 'application/vnd.neo4j.query'
 export function encodeAuthToken(auth: types.AuthToken): string {
     switch (auth.scheme) {
         case 'bearer':
-            return `Bearer ${btoa(auth.credentials)}`
+            return `Bearer ${auth.credentials}`
         case 'basic':
             return `Basic ${btoa(`${auth.principal}:${auth.credentials}`)}`
         default:

@@ -10,7 +10,7 @@
                 "equalTo": "application/vnd.neo4j.query, application/json"
             },
             "Authorization": {
-                "equalTo": "Bearer bmljZXN0VG9rZW5FdmVy"
+                "equalTo": "Bearer nicestTokenEver"
             },
             "Neo4j-Cluster-Affinity": {
                 "equalTo": "123abc"
