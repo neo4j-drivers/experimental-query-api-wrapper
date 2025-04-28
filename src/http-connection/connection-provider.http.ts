@@ -72,9 +72,6 @@ export default class HttpConnectionProvider extends ConnectionProvider {
     private _authTokenManager: AuthTokenManager
     private _config: types.InternalConfig
     private _queryEndpoint?: string
-    private _discoveryPromise?: Promise<{
-        query: string
-    }>
     private _openConnections: { [n: number]: HttpConnection }
     private _pool: internal.pool.Pool<HttpConnection>
     private _newHttpConnection: NewHttpConnection
@@ -91,6 +88,7 @@ export default class HttpConnectionProvider extends ConnectionProvider {
         this._authTokenManager = config.authTokenManager
         this._config = config.config
         this._openConnections = {}
+        this._queryEndpoint = `${this._scheme}://${this._address.asHostPort()}/db/{databaseName}/query/v2`
         this._newHttpConnection = newHttpConnection
         this._pool = newPool({
             create: this._createConnection.bind(this),
@@ -102,25 +100,12 @@ export default class HttpConnectionProvider extends ConnectionProvider {
     }
 
     async acquireConnection(param?: { accessMode?: string | undefined; database?: string | undefined; bookmarks: internal.bookmarks.Bookmarks; impersonatedUser?: string | undefined; onDatabaseNameResolved?: ((databaseName?: string | undefined) => void) | undefined; auth?: types.AuthToken | undefined } | undefined): Promise<Connection & Releasable> {
-        if (this._queryEndpoint == null) {
-            if (this._discoveryPromise == null) {
-                this._discoveryPromise = HttpConnection.discover({ address: this._address, scheme: this._scheme })
-                    .finally(() => {
-                        this._discoveryPromise = undefined
-                    })
-            }
-
-            const discoveryResult = await this._discoveryPromise
-            this._queryEndpoint = discoveryResult.query
-        }
-
         return await this._pool.acquire({ auth: param?.auth, queryEndpoint: this._queryEndpoint }, this._address)
     }
 
 
     async verifyConnectivityAndGetServerInfo(param: { database: string; accessMode?: string | undefined } | undefined): Promise<ServerInfo> {
         const discoveryInfo = await HttpConnection.discover({ scheme: this._scheme, address: this._address })
-        this._queryEndpoint = discoveryInfo.query
 
         const connection = await this._pool.acquire({ queryEndpoint: this._queryEndpoint }, this._address)
 
