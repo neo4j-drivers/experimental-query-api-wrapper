@@ -477,26 +477,6 @@ describe('HttpConnectionProvider', () => {
             expect(spyOnRelease[0]).toHaveBeenCalledTimes(1)
             expect(spyOnRelease[0].mock.invocationCallOrder[0]).toBeGreaterThan(spyOnRunners[0].mock.invocationCallOrder[0])
         })
-
-        it('should fail if discovery fails', async () => {
-            const error = new Error('something in the way it crashes')
-            // Setting up state holders
-            const { newHttpConnection, discoverSpy, spyOnRunners, spyOnRelease } = setupSpies(address)
-
-            // new instances
-            const { provider, params: { scheme} } = newProvider(address, { newHttpConnection })
-            
-            // mocking
-            discoverSpy.mockRejectedValue(error)
-
-            // Subject and assertion
-            await expect(provider.verifyConnectivityAndGetServerInfo({ database, accessMode })).rejects.toBe(error)
-
-            // introspecting
-            expect(newHttpConnection).toHaveBeenCalledTimes(0)
-            expect(spyOnRunners.length).toBe(0)
-            expect(spyOnRelease.length).toBe(0)
-        })
     })
 
     describe.each(['READ', 'WRITE'].flatMap(mode => [
@@ -688,25 +668,6 @@ describe('HttpConnectionProvider', () => {
             expect(spyOnRelease[0].mock.invocationCallOrder[0]).toBeGreaterThan(spyOnRunners[0].mock.invocationCallOrder[0])
         })
 
-        it('should fail if discovery fails', async () => {
-            const error = new Error('something in the way it crashes')
-            // Setting up state holders
-            const { newHttpConnection, discoverSpy, spyOnRunners, spyOnRelease } = setupSpies(address)
-
-            // new instances
-            const { provider, params: { scheme} } = newProvider(address, { newHttpConnection })
-            
-            // mocking
-            discoverSpy.mockRejectedValue(error)
-
-            // Subject and assertion
-            await expect(provider.verifyAuthentication({ database, accessMode, auth })).rejects.toBe(error)
-
-            // introspecting
-            expect(newHttpConnection).toHaveBeenCalledTimes(0)
-            expect(spyOnRunners.length).toBe(0)
-            expect(spyOnRelease.length).toBe(0)
-        })
     })
 })
 

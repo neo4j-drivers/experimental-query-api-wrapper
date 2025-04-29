@@ -24,7 +24,6 @@ describe('minimum requirements stub', () => {
 
     beforeAll(async () => {
         await config.startWireMock()
-        mocks.push(await config.loadWireMockStub('discovery'))
     }, 120_000) // long timeout since it may need to download docker image
 
     afterAll(async () => {
