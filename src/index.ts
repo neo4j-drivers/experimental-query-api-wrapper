@@ -142,7 +142,7 @@ function createAuthManager (authTokenOrProvider: AuthToken | AuthTokenManager): 
 function wrapper (
   url: HttpUrl | string,
   authToken: AuthToken | AuthTokenManager,
-  config: Config = {},
+  config: Config = {}
 ): Wrapper {
   assertString(url, 'Http URL')
   const parsedUrl = urlUtil.parseDatabaseUrl(url)
