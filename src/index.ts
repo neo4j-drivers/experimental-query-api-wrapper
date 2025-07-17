@@ -154,11 +154,10 @@ function wrapper (
   let routing = false
   let encrypted = false
   let trust: TrustStrategy | undefined
-  let http = false
   switch (parsedUrl.scheme) {
     case 'http':
     case 'https':
-      http = true
+      encrypted = true
       break
     default:
       throw new Error(`Unknown scheme: ${parsedUrl.scheme ?? 'null'}`)
