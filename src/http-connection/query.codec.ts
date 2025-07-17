@@ -465,7 +465,7 @@ class QuerySuccessResponseCodec extends QueryResponseCodec {
         let timePart = false
 
         for (const ch of durationStringWithP) {
-            if (ch >= '0' && ch <= '9' || ch === '.' || ch === ',') {
+            if (ch >= '0' && ch <= '9' || ch === '.' || ch === ',' || (currentNumber.length === 0 && ch === '-')) {
                 currentNumber = currentNumber + ch
             } else {
                 switch (ch) {
