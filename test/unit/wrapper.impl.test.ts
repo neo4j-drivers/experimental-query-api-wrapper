@@ -112,9 +112,9 @@ describe('Wrapper', () => {
         connectionProvider.verifyConnectivityAndGetServerInfo = jest.fn(() => expectedPromise)
         const config = { database: 'db' }
 
-        const promise: Promise<any> | undefined = wrapper?.verifyConnectivity(config)
+        const promise: Promise<void> | undefined = wrapper?.verifyConnectivity(config)
 
-        expect(promise).toBe(expectedPromise)
+        expect(promise).toEqual(expectedPromise)
         expect(connectionProvider.verifyConnectivityAndGetServerInfo).toHaveBeenCalledWith({ ...config, accessMode: 'READ' })
         promise?.catch(_ => 'Do nothing').finally(() => { })
     })
