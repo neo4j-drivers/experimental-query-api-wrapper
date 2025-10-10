@@ -14,8 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { newError, int, error, types, isInt, isPoint, isDuration, isLocalTime, isTime, isDate, isLocalDateTime, isDateTime, isRelationship, isPath, isNode, isPathSegment, isUnboundRelationship, isVector } from "neo4j-driver-core"
+import { newError, int, error, types, isInt, isPoint, isDuration, isLocalTime, isTime, isDate, isLocalDateTime, isDateTime, isRelationship, isPath, isNode, isPathSegment, isUnboundRelationship, isVector, isUnsupportedType } from "neo4j-driver-core"
 import { RunQueryConfig } from "neo4j-driver-core/types/connection"
 import { NEO4J_QUERY_CONTENT_TYPE, NEO4J_QUERY_CONTENT_TYPE_V1_0_JSONL, encodeAuthToken, encodeTransactionBody } from "./codec"
 import TypedJsonCodec, { Counters, NotificationShape, ProfiledQueryPlan, RawQueryValue, RawQueryError } from "./types.codec"
@@ -409,6 +408,8 @@ export class QueryRequestCodec {
             return { $type: 'OffsetDateTime', _value: value.toString() }
         } else if (isVector(value)) {
             throw newError('Vectors are not supported yet on query api', error.PROTOCOL_ERROR)
+        } else if (isUnsupportedType(value)) {
+            throw newError('UnsupportedType can not be ingested to the server', error.PROTOCOL_ERROR)
         } else if (isRelationship(value) || isNode(value) || isPath(value) || isPathSegment(value) || isUnboundRelationship(value)) {
             throw newError('Graph types can not be ingested to the server', error.PROTOCOL_ERROR) 
         } else if (typeof value === 'object') {
