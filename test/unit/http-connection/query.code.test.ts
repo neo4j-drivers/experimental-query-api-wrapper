@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import neo4j, { auth, types, internal, int, Date, Time, LocalTime, DateTime, LocalDateTime, Point, Duration, Node, Relationship, UnboundRelationship, Path, PathSegment, Vector } from "neo4j-driver-core";
+import neo4j, { auth, types, internal, int, Date, Time, LocalTime, DateTime, LocalDateTime, Point, Duration, Node, Relationship, UnboundRelationship, Path, PathSegment, Vector, UnsupportedType } from "neo4j-driver-core";
 import { QueryRequestCodec, QueryRequestCodecConfig, QueryResponseCodec, RawQueryResponse, RawQueryValue } from "../../../src/http-connection/query.codec";
 
 describe('QueryRequestCodec', () => {
@@ -208,6 +208,17 @@ describe('QueryRequestCodec', () => {
             })
 
             expect(() => codec.body).toThrow('Graph types can not be ingested to the server')
+        })
+
+        it('should not handle UnsupportedType as parameters ', () => {
+            const param = new UnsupportedType("Vector", 6, 0, "Something good is bad, actually!")
+            const codec = subject({
+                parameters: {
+                    param
+                }
+            })
+
+            expect(() => codec.body).toThrow('UnsupportedType can not be ingested to the server')
         })
 
         it.each([
