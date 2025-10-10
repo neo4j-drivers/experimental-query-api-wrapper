@@ -36,7 +36,7 @@ export class WrapperImpl implements Wrapper {
         return this.driver.executeQueryBookmarkManager
     }
     
-    verifyConnectivity(config: { database: string }): Promise<ServerInfo> {
+    verifyConnectivity(config: { database: string }): Promise<void> {
         validateDatabase(config)
         return this.driver.verifyConnectivity(config)
     }

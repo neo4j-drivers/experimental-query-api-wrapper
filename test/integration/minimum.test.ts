@@ -98,7 +98,7 @@ when(config.version >= 5.23, () => describe.each(runners())('minimum requirement
     [config.database],
     ['system']
   ])('should verifyConnectivity ({ database: "%s"})', async (database) => {
-    await expect(wrapper.verifyConnectivity({ database })).resolves.toBeDefined()
+    await expect(wrapper.verifyConnectivity({ database })).resolves.toBeUndefined()
   })
 
   it('should supportMultiDb resolves true',async () => {

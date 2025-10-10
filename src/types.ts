@@ -18,7 +18,7 @@ import { Driver, Session, SessionConfig, Config, ServerInfo, types } from "neo4j
 
 type Disposable = { [Symbol.asyncDispose] (): Promise<void> }
 type VerifyConnectivity = { 
-  verifyConnectivity(config: { database: string | undefined; } | undefined): Promise<ServerInfo>
+  verifyConnectivity(config: { database: string | undefined; } | undefined): Promise<void>
 }
 
 type VerifyAuthentication = {
