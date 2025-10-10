@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { Connection, types, internal, newError } from "neo4j-driver-core"
+import { Connection, types, internal, newError, ProtocolVersion } from "neo4j-driver-core"
 import { BeginTransactionConfig, CommitTransactionConfig, RunQueryConfig } from "neo4j-driver-core/types/connection"
 import { ResultStreamObserver } from "./stream-observers"
 import { QueryRequestCodec, QueryResponseCodec, RawQueryResponse } from "./query.codec"
@@ -388,8 +388,8 @@ export default class HttpConnection extends Connection {
         return this._queryEndpoint
     }
 
-    getProtocolVersion(): number {
-        return 0
+    getProtocolVersion(): ProtocolVersion {
+        return new ProtocolVersion(0, 0)
     }
 
     isOpen(): boolean {

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import neo4j, { auth, types, internal, int, Date, Time, LocalTime, DateTime, LocalDateTime, Point, Duration, Node, Relationship, UnboundRelationship, Path, PathSegment } from "neo4j-driver-core";
+import neo4j, { auth, types, internal, int, Date, Time, LocalTime, DateTime, LocalDateTime, Point, Duration, Node, Relationship, UnboundRelationship, Path, PathSegment, Vector } from "neo4j-driver-core";
 import { QueryRequestCodec, QueryRequestCodecConfig, QueryResponseCodec, RawQueryResponse, RawQueryValue } from "../../../src/http-connection/query.codec";
 
 describe('QueryRequestCodec', () => {
@@ -161,7 +161,7 @@ describe('QueryRequestCodec', () => {
             ['OffsetDateTime', v(new DateTime(1988, 8, 23, 12, 50, 35, 556000000, -3600), { $type: 'OffsetDateTime', _value: '1988-08-23T12:50:35.556000000-01:00' })],
             ['ZonedAndOffsetDateTime', v(new DateTime(1988, 8, 23, 12, 50, 35, 556000000, 3600, 'Antarctica/Troll'), { $type: 'ZonedDateTime', _value: '1988-08-23T12:50:35.556000000+01:00[Antarctica/Troll]' })],
             ['LocalDateTime', v(new LocalDateTime(2001, 5, 3, 13, 45, 0, 3404004), { $type: 'LocalDateTime', _value: '2001-05-03T13:45:00.003404004' })],
-            ['Duration', v(new Duration(0, 14, 16, 0), { $type: 'Duration', _value: 'P0M14DT16S' })],
+            ['Duration', v(new Duration(0, 14, 16, 0), { $type: 'Duration', _value: 'P14DT16S' })],
             ['WGS Point 2D', v(new Point(int(4326), 1.2, 3.4), { '$type': 'Point', _value: 'SRID=4326;POINT (1.2 3.4)' })],
             ['CARTESIAN Point 2D', v(new Point(int(7203), 1.2, 3.4), { '$type': 'Point', _value: 'SRID=7203;POINT (1.2 3.4)' })],
             ['WGS Point 3D', v(new Point(int(4979), 1.2, 3.4, 5.6), { '$type': 'Point', _value: 'SRID=4979;POINT Z (1.2 3.4 5.6)' })],
@@ -208,6 +208,22 @@ describe('QueryRequestCodec', () => {
             })
 
             expect(() => codec.body).toThrow('Graph types can not be ingested to the server')
+        })
+
+        it.each([
+            ['Vector<INT8>', new Vector(new Int8Array([-127, 0, 128]))],
+            ['Vector<INT16>', new Vector(new Int16Array([-1273, 0, 1283]))],
+            ['Vector<INT32>', new Vector(new Int32Array([-1273, 0, 1283]))],
+            ['Vector<INT64>', new Vector(new BigInt64Array([BigInt(-1273), BigInt(0), BigInt(1283)]))],
+            ['Vector<FLOAT32>', new Vector(new Float32Array([-1273.13, 0, 1283.34]))],
+            ['Vector<FLOAT64>', new Vector(new Float64Array([-1273.123, 0, 1283]))]
+        ])('should not support (%) as parameter', (_, param) => {
+            const codec = subject({
+                parameters: {
+                    param
+                }
+            })
+            expect(() => codec.body).toThrow('Vectors are not supported yet on query api')
         })
 
     })

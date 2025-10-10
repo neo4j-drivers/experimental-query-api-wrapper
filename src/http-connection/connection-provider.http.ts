@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ConnectionProvider, internal, AuthTokenManager, Connection, Releasable, types, ServerInfo } from "neo4j-driver-core"
+import { ConnectionProvider, internal, AuthTokenManager, Connection, Releasable, types, ServerInfo, ProtocolVersion } from "neo4j-driver-core"
 import HttpConnection, { HttpScheme } from "./connection.http"
 
 const {
@@ -100,6 +100,7 @@ export default class HttpConnectionProvider extends ConnectionProvider {
     }
 
     async acquireConnection(param?: { accessMode?: string | undefined; database?: string | undefined; bookmarks: internal.bookmarks.Bookmarks; impersonatedUser?: string | undefined; onDatabaseNameResolved?: ((databaseName?: string | undefined) => void) | undefined; auth?: types.AuthToken | undefined } | undefined): Promise<Connection & Releasable> {
+        // @ts-expect-error sending unexpected data
         return await this._pool.acquire({ auth: param?.auth, queryEndpoint: this._queryEndpoint }, this._address)
     }
 
@@ -107,14 +108,16 @@ export default class HttpConnectionProvider extends ConnectionProvider {
     async verifyConnectivityAndGetServerInfo(param: { database: string; accessMode?: string | undefined } | undefined): Promise<ServerInfo> {
         const discoveryInfo = await HttpConnection.discover({ scheme: this._scheme, address: this._address })
 
+        // @ts-expect-error sending unexpected data
         const connection = await this._pool.acquire({ queryEndpoint: this._queryEndpoint }, this._address)
 
         try {
             await run(connection, param)
+            var [major, minor] = discoveryInfo.version.split('.');
             return new ServerInfo({
                 address: this._address.asHostPort(),
                 version: discoveryInfo.version
-            }, parseFloat(discoveryInfo.version))
+            }, new ProtocolVersion(parseInt(major), parseInt(minor)))
         } finally {
             await connection.release()
         }

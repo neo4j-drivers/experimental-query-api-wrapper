@@ -19,7 +19,7 @@ import HttpConnectionProvider, {
     HttpConnectionProviderInjectable, NewHttpConnection
 } from '../../../src/http-connection/connection-provider.http'
 
-import { auth, internal, newError, staticAuthTokenManager } from "neo4j-driver-core"
+import { ProtocolVersion, auth, internal, newError, staticAuthTokenManager } from "neo4j-driver-core"
 import HttpConnection, { HttpScheme } from '../../../src/http-connection/connection.http'
 import { RunQueryConfig } from "neo4j-driver-core/types/connection"
 import { ResultStreamObserver } from '../../../src/http-connection/stream-observers'
@@ -379,7 +379,7 @@ describe('HttpConnectionProvider', () => {
 
             // Assert results
             expect(result.address).toBe(address.asHostPort())
-            expect(result.protocolVersion).toBe(5.19)
+            expect(result.protocolVersion).toEqual(new ProtocolVersion(5, 19))
             expect(result.agent).toBe('5.19.0')
 
             // introspecting
