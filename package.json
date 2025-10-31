@@ -1,6 +1,6 @@
 {
   "name": "@neo4j-labs/experimental-query-api-wrapper",
-  "version": "0.0.1-alpha10",
+  "version": "0.0.1-alpha11",
   "description": "Experimental wrapper library to access Neo4j Database using Query API with a neo4j-driver-like interface.",
   "main": "lib/index.js",
   "types": "types/index.d.ts",
@@ -51,7 +51,7 @@
     "yarn": "^1.22.22"
   },
   "dependencies": {
-    "neo4j-driver-core": "=6.0.0"
+    "neo4j-driver-core": "=6.0.1"
   },
   "engines": {
     "node": ">=18.0.0"
