@@ -340,7 +340,7 @@ class QuerySuccessResponseCodec extends QueryResponseCodec {
 
         secondStr = secondStr.substring(0, 2)
 
-        const nanosecond = int(nanosecondString.padEnd(9, '0'))
+        const nanosecond = nanosecondString === undefined ? int(0) : int((nanosecondString).padEnd(9, '0'))
 
         if (hasOffset) {
             const timeZoneOffsetInSeconds = int(offsetHourString).multiply(60).add(int(offsetMinuteString ?? '0')).multiply(60).multiply(isPositive ? 1 : -1)
@@ -377,13 +377,14 @@ class QuerySuccessResponseCodec extends QueryResponseCodec {
         // 12:50:35.556
         const [hourStr, minuteString, secondNanosecondAndOffsetString] = value.split(':')
         const [secondStr, nanosecondString] = secondNanosecondAndOffsetString.split('.')
-        const nanosecond = int(nanosecondString.padEnd(9, '0'))
+        const nanosecond = nanosecondString === undefined ? int(0) : int((nanosecondString).padEnd(9, '0'))
 
         return new LocalTime(
             this._decodeInteger(hourStr),
             this._decodeInteger(minuteString),
             this._decodeInteger(secondStr),
-            this._normalizeInteger(nanosecond))
+            this._normalizeInteger(nanosecond)
+        )
     }
 
     _decodeZonedDateTime(value: string): DateTime<Integer | bigint | number> {

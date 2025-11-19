@@ -173,7 +173,9 @@ when(config.version >= 5.23, () => describe.each(runners())('minimum requirement
     // Temporal Types
     ['Duration', v(new Duration(int(1), int(2), int(30), int(3000)))],
     ['LocalTime', v(new LocalTime(int(1), int(2), int(20), int(234)))],
+    ['LocalTime without nanos', v(new LocalTime(int(1), int(2), int(20), int(0)))],
     ['Time', v(new Time(int(1), int(20), int(23), int(234), int(7200)))],
+    ['Time without nanos', v(new Time(int(1), int(20), int(23), int(0), int(7200)))],
     ['Date', v(new Date(int(1999), int(6), int(12)))],
     ['LocalDateTime', v(new LocalDateTime(int(1999), int(6), int(12), int(1), int(2), int(20), int(234)))],
     ['DateTime Offset and Zone', v(new DateTime(int(1999), int(6), int(12), int(1), int(2), int(20), int(234), int(7200), 'Europe/Berlin'))],
