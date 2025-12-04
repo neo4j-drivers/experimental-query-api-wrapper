@@ -7,7 +7,7 @@
                 "equalTo": "application/vnd.neo4j.query"
             },
             "Accept": {
-                "equalTo": "application/vnd.neo4j.query, application/json"
+                "equalTo": "application/vnd.neo4j.query.v1.0+jsonl, application/vnd.neo4j.query, application/json"
             },
             "Authorization": {
                 "equalTo": "Bearer nicestTokenEver"
