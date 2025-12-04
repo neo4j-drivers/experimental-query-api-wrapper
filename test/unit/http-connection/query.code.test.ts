@@ -31,7 +31,7 @@ describe('QueryRequestCodec', () => {
     })
 
     describe('.accept', () => {
-        it('should return "application/vnd.neo4j.query.v1.0+jsonl,application/vnd.neo4j.query, application/json"', () => {
+        it('should return "application/vnd.neo4j.query.v1.0+jsonl, application/vnd.neo4j.query, application/json"', () => {
             const codec = subject()
 
             expect(codec.accept).toBe('application/vnd.neo4j.query.v1.0+jsonl,application/vnd.neo4j.query, application/json')

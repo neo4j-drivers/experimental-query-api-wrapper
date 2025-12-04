@@ -332,7 +332,7 @@ export class QueryRequestCodec {
     }
 
     get accept(): string {
-        return `${NEO4J_QUERY_JSONL_CONTENT_TYPE},${NEO4J_QUERY_CONTENT_TYPE}, application/json`
+        return `${NEO4J_QUERY_JSONL_CONTENT_TYPE}, ${NEO4J_QUERY_CONTENT_TYPE}, application/json`
     }
 
     get authorization(): string {
