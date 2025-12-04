@@ -16,7 +16,7 @@
  */
 
 import neo4j, { auth, types, internal, int, Date, Time, LocalTime, DateTime, LocalDateTime, Point, Duration, Node, Relationship, UnboundRelationship, Path, PathSegment, Vector } from "neo4j-driver-core";
-import { QueryRequestCodec, QueryRequestCodecConfig, QueryResponseCodec, RawQueryResponse, RawQueryValue } from "../../../src/http-connection/query.codec";
+import { QueryRequestCodec, QueryRequestCodecConfig, QueryResponseCodec, RawQueryResponse } from "../../../src/http-connection/query.codec";
 
 describe('QueryRequestCodec', () => {
     const DEFAULT_AUTH = auth.basic('neo4j', 'password')
@@ -31,10 +31,10 @@ describe('QueryRequestCodec', () => {
     })
 
     describe('.accept', () => {
-        it('should return "application/vnd.neo4j.query, application/json"', () => {
+        it('should return "application/vnd.neo4j.query.v1.0+jsonl,application/vnd.neo4j.query, application/json"', () => {
             const codec = subject()
 
-            expect(codec.accept).toBe('application/vnd.neo4j.query, application/json')
+            expect(codec.accept).toBe('application/vnd.neo4j.query.v1.0+jsonl,application/vnd.neo4j.query, application/json')
         })
     })
 
@@ -1983,7 +1983,7 @@ describe('QueryResponseCodec', () => {
                         ]
                     ].map(([_value, expected]) => [`Path (value=${_value})`, [[{ $type: 'Path', _value }]], [[expected]], config]),
             ])
-        ])('should handle %s values', (_: string, values: any, expected: any, config?: Partial<types.InternalConfig>) => {
+        ])('should handle %s values', async (_: string, values: any, expected: any, config?: Partial<types.InternalConfig>) => {
             const codec = subject({
                 rawQueryResponse: {
                     ...DEFAULT_RAW_RESPONSE,
@@ -1995,10 +1995,19 @@ describe('QueryResponseCodec', () => {
                 config
             })
 
-            expect([...codec.stream()]).toEqual(expected)
+            const result = []
+            for await (const v of codec.stream()) {
+                result.push(v)
+            }
+
+            expect(result).toEqual(expected)
             // the stream should be consumed,
             // no data should come after
-            expect([...codec.stream()]).toEqual([])
+            const emptyResult = []
+            for await (const v of codec.stream()) {
+                emptyResult.push(v)
+            }
+            expect(emptyResult).toEqual([])
         })
 
         it.each(
@@ -2006,7 +2015,12 @@ describe('QueryResponseCodec', () => {
         )('should handle %s failures', (_: string, param: SubjectParams) => {
             const codec = subject(param)
 
-            expect(() => codec.stream()).toThrow(codec.error)
+            expect(async () => {
+                const ignored = []
+                for await (const v of codec.stream()) {
+                    ignored.push(v)
+                }
+            }).rejects.toThrow(codec.error)
         })
     })
 

@@ -18,8 +18,8 @@
 import { types } from "neo4j-driver-core"
 import { BeginTransactionConfig } from "neo4j-driver-core/types/connection"
 
-
 export const NEO4J_QUERY_CONTENT_TYPE = 'application/vnd.neo4j.query'
+export const NEO4J_QUERY_JSONL_CONTENT_TYPE = 'application/vnd.neo4j.query.v1.0+jsonl';
 
 export function encodeAuthToken(auth: types.AuthToken): string {
     switch (auth.scheme) {

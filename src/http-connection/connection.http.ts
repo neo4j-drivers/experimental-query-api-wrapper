@@ -99,13 +99,9 @@ export default class HttpConnection extends Connection {
     
             this._log?.debug(`${this} REQUEST: ${JSON.stringify(request)}`)
 
-            const res = await fetch(request.url, request)
-            const { body: rawQueryResponse, headers: [contentType] } = await readBodyAndReaders<RawQueryResponse>(request.url, res, 'content-type')
-            
-            this._log?.debug(`${this} RESPONSE: { body: ${JSON.stringify(rawQueryResponse)}, headers: { content-type: ${contentType} }}`);
-            
+            const res = await fetch(request.url, request) 
             const batchSize = config?.fetchSize ?? Number.MAX_SAFE_INTEGER
-            const codec = QueryResponseCodec.of(this._config, contentType ?? '', rawQueryResponse);
+            const codec = await QueryResponseCodec.ofResponse(this._config, request.url, res);
 
             if (codec.error) {
                 throw codec.error
@@ -121,7 +117,7 @@ export default class HttpConnection extends Connection {
                 }
 
                 for (let i = 0; !observer.paused && i < batchSize && !observer.completed; i++) {
-                    const { done, value: rawRecord } = stream.next()
+                    const { done, value: rawRecord } = await stream.next()
                     if (!done) {
                         observer.onNext(rawRecord)
                     } else {
