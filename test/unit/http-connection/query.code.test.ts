@@ -16,7 +16,7 @@
  */
 
 import neo4j, { auth, types, internal, int, Date, Time, LocalTime, DateTime, LocalDateTime, Point, Duration, Node, Relationship, UnboundRelationship, Path, PathSegment, Vector } from "neo4j-driver-core";
-import { QueryRequestCodec, QueryRequestCodecConfig, QueryResponseCodec, RawQueryResponse, RawQueryValue } from "../../../src/http-connection/query.codec";
+import { QueryRequestCodec, QueryRequestCodecConfig, QueryResponseCodec, RawQueryResponse } from "../../../src/http-connection/query.codec";
 
 describe('QueryRequestCodec', () => {
     const DEFAULT_AUTH = auth.basic('neo4j', 'password')
