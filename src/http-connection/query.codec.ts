@@ -75,19 +75,19 @@ export class QueryResponseCodec {
             newError('Server replied an empty error response', error.PROTOCOL_ERROR))
     }
 
-    get error(): Error | undefined {
+    get error(): Promise<undefined> | Error | undefined {
         throw new Error('Not implemented')
     }
 
-    get keys(): string[] {
+    get keys(): string[] | Promise<string[]> {
         throw new Error('Not implemented')
     }
 
-    get meta(): Record<string, unknown> {
+    get meta(): Record<string, unknown> | Promise<Record<string, unknown>> {
         throw new Error('Not implemented')
     }
 
-    *stream(): Generator<any[]> {
+    *stream(): Generator<any[]> | AsyncGenerator<any[]> {
         throw new Error('Not implemented')
     }
 }
