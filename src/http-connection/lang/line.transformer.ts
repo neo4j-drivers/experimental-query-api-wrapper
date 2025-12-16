@@ -44,6 +44,6 @@ export default class LineTransformer implements Transformer<string, string> {
     }
 
     private shouldPrependRest(splitted: string[]) {
-        return splitted.length > 1 && this._rest != null;
+        return splitted.length > 0 && this._rest != null;
     }
 }
