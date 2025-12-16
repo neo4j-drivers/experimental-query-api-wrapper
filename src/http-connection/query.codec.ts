@@ -74,7 +74,6 @@ export class QueryResponseCodec {
         try {
             const text = await response.text()
             const body = text !== '' ? JSON.parse(text) : {};
-            console.log(body)
             return QueryResponseCodec.of(config, contentType, body);
         } catch (error) {
             throw newError(`Failure accessing "${url}"`, 'SERVICE_UNAVAILABLE', error)
@@ -241,11 +240,12 @@ class QueryJsonlResponseCodec extends QueryResponseCodec {
             if (this._done) {
                 return;
             }
-            if (event.$event === 'Header') {
+
+            if (event?.$event === 'Header') {
                 this._processHeader(event)
-            } else if(event.$event === 'Record') {
+            } else if(event?.$event === 'Record') {
                 yield event._body.map(this._typedJsonCodec.decodeValue.bind(this._typedJsonCodec))
-            } else if(event.$event === 'Summary') {
+            } else if(event?.$event === 'Summary') {
                 this._processSummary(event)
             } else {
                 this._error = newError(`${event?.$event} is not expected`, error.PROTOCOL_ERROR)
@@ -255,12 +255,15 @@ class QueryJsonlResponseCodec extends QueryResponseCodec {
         return
     }
 
-    private async _next(): Promise<Event> {
+    private async _next(): Promise<Event | undefined> {
         if (this._done) {
             throw newError("Closed streaming.", error.PROTOCOL_ERROR)
         }
         const { value: event, done } = await this._it.next() as { value: Event, done: boolean }
         this._done = done === true
+        if (this._done) {
+            return event
+        }
 
         if (event.$event === 'Error') {
             this._error = event._body.length > 0 ? newError(
