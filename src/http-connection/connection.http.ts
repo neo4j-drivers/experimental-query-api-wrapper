@@ -34,7 +34,7 @@ export interface HttpConnectionConfig {
     address: internal.serverAddress.ServerAddress
     config: WrapperConfig
     logger: internal.logger.Logger,
-    errorHandler: (error: Error & { code: string, retriable: boolean }) => Error
+    errorHandler: (error: Error & { code: string, retryable: boolean }) => Error
 }
 
 
@@ -48,7 +48,7 @@ export default class HttpConnection extends Connection {
     private _log?: internal.logger.Logger
     private _sessionAffinityHeader: string 
     private _id: number
-    private _errorHandler: (error: Error & { code: string, retriable: boolean }) => Error
+    private _errorHandler: (error: Error & { code: string, retryable: boolean }) => Error
     private _open: boolean
     private _currentTx: { id: string, affinity?: string, host?: string, expires: Date,  database: string } | undefined
     private _workPipe: Pipe
