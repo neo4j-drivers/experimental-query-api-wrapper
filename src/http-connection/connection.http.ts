@@ -107,11 +107,9 @@ export default class HttpConnection extends Connection {
             const batchSize = config?.fetchSize ?? Number.MAX_SAFE_INTEGER
             const codec = QueryResponseCodec.of(this._config, contentType ?? '', rawQueryResponse);
 
-            if (codec.error) {
-                throw codec.error
-            }
+        
 
-            observer.onKeys(codec.keys)
+            observer.onKeys(await codec.keys)
             const stream = codec.stream()
 
             while (!observer.completed) {
@@ -121,16 +119,16 @@ export default class HttpConnection extends Connection {
                 }
 
                 for (let i = 0; !observer.paused && i < batchSize && !observer.completed; i++) {
-                    const { done, value: rawRecord } = stream.next()
+                    const { done, value: rawRecord } = await stream.next()
                     if (!done) {
                         observer.onNext(rawRecord)
                     } else {
-                        observer.onCompleted(codec.meta)
+                        observer.onCompleted(await codec.meta)
                     }
                 }
             }
 
-            observer.onCompleted(codec.meta)            
+            observer.onCompleted(await codec.meta)            
         })
             .catch(this._catch(observer))
             .finally(this._finally(abortController))

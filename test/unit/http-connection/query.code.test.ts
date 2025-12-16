@@ -16,7 +16,7 @@
  */
 
 import neo4j, { auth, types, internal, int, Date, Time, LocalTime, DateTime, LocalDateTime, Point, Duration, Node, Relationship, UnboundRelationship, Path, PathSegment, Vector } from "neo4j-driver-core";
-import { QueryRequestCodec, QueryRequestCodecConfig, QueryResponseCodec, RawQueryResponse, RawQueryValue } from "../../../src/http-connection/query.codec";
+import { QueryRequestCodec, QueryRequestCodecConfig, QueryResponseCodec, RawQueryResponse } from "../../../src/http-connection/query.codec";
 
 describe('QueryRequestCodec', () => {
     const DEFAULT_AUTH = auth.basic('neo4j', 'password')
@@ -310,6 +310,7 @@ describe('QueryResponseCodec', () => {
             })
 
             expect(codec.error).toBeDefined()
+            // @ts-expect-error 
             expect(codec.error?.message).toEqual('Something wrong is mighty right')
             // @ts-expect-error
             expect(codec.error?.code).toEqual('Neo.ClientError.Made.Up')
@@ -324,6 +325,7 @@ describe('QueryResponseCodec', () => {
             })
 
             expect(codec.error).toBeDefined()
+            // @ts-expect-error
             expect(codec.error?.message).toEqual('Server replied an empty error response')
             // @ts-expect-error
             expect(codec.error?.code).toEqual('ProtocolError')
@@ -335,6 +337,7 @@ describe('QueryResponseCodec', () => {
             })
 
             expect(codec.error).toBeDefined()
+            // @ts-expect-error
             expect(codec.error?.message).toEqual('Wrong content-type. Expected "application/vnd.neo4j.query", but got "application/json".')
             // @ts-expect-error
             expect(codec.error?.code).toEqual('ProtocolError')
@@ -365,6 +368,7 @@ describe('QueryResponseCodec', () => {
         )('should handle %s failures', (_: string, param: SubjectParams) => {
             const codec = subject(param)
 
+            // @ts-expect-error
             expect(() => codec.keys).toThrow(codec.error)
         })
     })
@@ -382,7 +386,7 @@ describe('QueryResponseCodec', () => {
                     bookmarks: bookmarks as []
                 }
             })
-
+            // @ts-expect-error
             expect(codec.meta.bookmark).toEqual(bookmarks)
         })
 
@@ -530,6 +534,7 @@ describe('QueryResponseCodec', () => {
                 config
             })
 
+            // @ts-expect-error
             expect(codec.meta.stats).toEqual(expected)
         })
 
@@ -596,6 +601,7 @@ describe('QueryResponseCodec', () => {
                 config
             })
 
+            // @ts-expect-error
             expect(codec.meta.profile).toEqual(expected)
         })
 
@@ -662,6 +668,7 @@ describe('QueryResponseCodec', () => {
                 config
             })
 
+            // @ts-expect-error
             expect(codec.meta.plan).toEqual(expected)
         })
 
@@ -1628,6 +1635,7 @@ describe('QueryResponseCodec', () => {
         )('should handle %s failures', (_: string, param: SubjectParams) => {
             const codec = subject(param)
 
+            // @ts-expect-error
             expect(() => codec.meta).toThrow(codec.error)
         })
     })
@@ -1995,9 +2003,11 @@ describe('QueryResponseCodec', () => {
                 config
             })
 
+            // @ts-expect-error
             expect([...codec.stream()]).toEqual(expected)
             // the stream should be consumed,
             // no data should come after
+            // @ts-expect-error
             expect([...codec.stream()]).toEqual([])
         })
 
@@ -2006,6 +2016,7 @@ describe('QueryResponseCodec', () => {
         )('should handle %s failures', (_: string, param: SubjectParams) => {
             const codec = subject(param)
 
+            // @ts-expect-error
             expect(() => codec.stream()).toThrow(codec.error)
         })
     })
