@@ -88,6 +88,25 @@ describe('LineTransformer', () => {
         expect(spyOnError).not.toHaveBeenCalled()
     })
 
+    it('should handle errors while processing chunks', () => {
+        const transformer = new LineTransformer()
+        const { controller, spyOnError, spyOnEnqueue } = mockController()
+
+        const line = new String("theline\n")
+
+        const spyOnLine = jest.spyOn(line, 'split')
+        const expectedError = new Error('ops')
+        spyOnLine.mockImplementation(() => {
+            throw expectedError
+        })
+
+        // @ts-expect-error
+        transformer.transform(line, controller)
+    
+        expect(spyOnEnqueue).not.toHaveBeenCalled()
+        expect(spyOnError).toHaveBeenCalledWith(expectedError)
+    })
+
     function lines () {
         return [
             [["i'm a single line"]],

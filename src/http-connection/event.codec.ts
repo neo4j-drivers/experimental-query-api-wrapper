@@ -49,7 +49,7 @@ export type ErrorEvent = {
 export type Event = HeaderEvent | RecordEvent | SummaryEvent | ErrorEvent;
 
 
-export function isEvent(obj: any): obj is Event {
+function isEvent(obj: any): obj is Event {
     return obj != null && typeof obj.$event === "string" && typeof obj._body === 'object' && obj._body != null
 }
 
