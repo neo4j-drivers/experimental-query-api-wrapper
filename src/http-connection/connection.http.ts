@@ -34,7 +34,7 @@ export interface HttpConnectionConfig {
     address: internal.serverAddress.ServerAddress
     config: WrapperConfig
     logger: internal.logger.Logger,
-    errorHandler: (error: Error & { code: string, retriable: boolean }) => Error
+    errorHandler: (error: Error & { code: string, retryable: boolean }) => Error
 }
 
 
@@ -48,7 +48,7 @@ export default class HttpConnection extends Connection {
     private _log?: internal.logger.Logger
     private _sessionAffinityHeader: string 
     private _id: number
-    private _errorHandler: (error: Error & { code: string, retriable: boolean }) => Error
+    private _errorHandler: (error: Error & { code: string, retryable: boolean }) => Error
     private _open: boolean
     private _currentTx: { id: string, affinity?: string, host?: string, expires: Date,  database: string } | undefined
     private _workPipe: Pipe
@@ -100,14 +100,8 @@ export default class HttpConnection extends Connection {
             this._log?.debug(`${this} REQUEST: ${JSON.stringify(request)}`)
 
             const res = await fetch(request.url, request)
-            const { body: rawQueryResponse, headers: [contentType] } = await readBodyAndReaders<RawQueryResponse>(request.url, res, 'content-type')
-            
-            this._log?.debug(`${this} RESPONSE: { body: ${JSON.stringify(rawQueryResponse)}, headers: { content-type: ${contentType} }}`);
-            
             const batchSize = config?.fetchSize ?? Number.MAX_SAFE_INTEGER
-            const codec = QueryResponseCodec.of(this._config, contentType ?? '', rawQueryResponse);
-
-        
+            const codec = await QueryResponseCodec.ofResponse(this._config, request.url, res);
 
             observer.onKeys(await codec.keys)
             const stream = codec.stream()

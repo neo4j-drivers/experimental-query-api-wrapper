@@ -472,7 +472,7 @@ when(config.version >= 5.23, () => describe.each(runners())('minimum requirement
       
       expect(error).toBeInstanceOf(Neo4jError)
       expect(error.code).toEqual('Neo.ClientError.Security.Unauthorized')
-      expect(error.retriable).toEqual(true)
+      expect(error.retryable).toEqual(true)
       expect(typeof error.message).toEqual('string')
       expect(error.message.trim()).not.toEqual('')
 
