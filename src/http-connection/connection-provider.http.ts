@@ -170,7 +170,7 @@ export default class HttpConnectionProvider extends ConnectionProvider {
             queryEndpoint: context.queryEndpoint,
             config: this._config,
             logger: this._log,
-            errorHandler: (error: Error & { code: string, retriable: boolean }): Error => {
+            errorHandler: (error: Error & { code: string, retryable: boolean }): Error => {
                 if (error == null || typeof error.code !== 'string' || !error.code.startsWith('Neo.ClientError.Security.') || context?.auth != null) {
                     if (error != null && error.code === 'SERVICE_UNAVAILABLE') {
                         this._queryEndpoint = undefined
@@ -179,7 +179,7 @@ export default class HttpConnectionProvider extends ConnectionProvider {
                 }
                 const handled = this._authTokenManager.handleSecurityException(auth, error.code as unknown as `Neo.ClientError.Security.${string}`)
                 if (handled) {
-                    error.retriable = true
+                    error.retryable = true
                 }
 
                 return error
