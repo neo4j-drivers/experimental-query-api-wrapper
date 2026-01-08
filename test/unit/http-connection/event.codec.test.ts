@@ -14,12 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { QueryApiEventTransformer, Event, HeaderEvent } from '../../../src/http-connection/event.codec'
+import { QueryApiEventTransformer, Event, HeaderEvent, RecordEvent, SummaryEvent, ErrorEvent } from '../../../src/http-connection/event.codec'
 import { TransformStreamDefaultController } from 'stream/web'
 
 describe('QueryApiEventTransformer', () => {
 
-    it.each(headers())('should handle Header', (json, header) => {
+    it.each([
+        ...headers(),
+        ...records(),
+        ...summaries(),
+        ...errors()
+    ])('should handle well formed events', (json, event) => {
         const transformer = new QueryApiEventTransformer()
         const { controller, spyOnEnqueue, spyOnError } = mockController()
 
@@ -27,7 +32,48 @@ describe('QueryApiEventTransformer', () => {
 
         expect(spyOnError).not.toHaveBeenCalled()
         expect(spyOnEnqueue).toHaveBeenCalledTimes(1)
-        expect(spyOnEnqueue).toHaveBeenCalledWith(header)
+        expect(spyOnEnqueue).toHaveBeenCalledWith(event)
+    })
+
+    it('should emit error when not well formed json events', () => {
+        const transformer = new QueryApiEventTransformer()
+        const { controller, spyOnEnqueue, spyOnError } = mockController()
+
+        transformer.transform('{ $event: "Header", _body: { fields: ["abc", "cbd"] } }', controller)
+
+        expect(spyOnEnqueue).not.toHaveBeenCalled()
+        expect(spyOnError).toHaveBeenCalled()
+    })
+
+    it.each(invalidEvents())('should emit error when not well formed event', (json) => {
+        const transformer = new QueryApiEventTransformer()
+        const { controller, spyOnEnqueue, spyOnError } = mockController()
+
+        transformer.transform(json, controller)
+
+        expect(spyOnEnqueue).not.toHaveBeenCalled()
+        expect(spyOnError).toHaveBeenCalled()
+    })
+
+    it.each([
+        ...headers(),
+        ...records(),
+        ...summaries(),
+        ...errors()
+    ])('should recover from error', (json, event) => {
+        const transformer = new QueryApiEventTransformer()
+        const { controller, spyOnEnqueue, spyOnError } = mockController()
+
+        // Error happened
+        transformer.transform('{ $event: "Header", _body: { fields: ["abc", "cbd"] } }', controller)
+        expect(spyOnEnqueue).not.toHaveBeenCalled()
+        expect(spyOnError).toHaveBeenCalled()
+
+        // Other events came
+        transformer.transform(json, controller)
+
+        expect(spyOnEnqueue).toHaveBeenCalledTimes(1)
+        expect(spyOnEnqueue).toHaveBeenCalledWith(event)
     })
 
     function headers(): [string, HeaderEvent][] {
@@ -38,6 +84,45 @@ describe('QueryApiEventTransformer', () => {
             // This shouldn't happen in the current use of the events. 
             // However, this is supported for case when events are using on start and finish transactions.
             ['{ "$event": "Header", "_body": { } }', { $event: "Header", _body: {  } }]
+        ]
+    }
+
+    function records(): [string, RecordEvent][] {
+        return [
+            ['{ "$event": "Record", "_body": [{ "$type": "Integer", "_value": "123" }, { "$type": "String", "_value": "abcde" }]}', { $event: 'Record', _body: [{ $type: 'Integer', _value: '123' }, { $type: 'String', _value: 'abcde' }]}],
+            ['{ "$event": "Record", "_body": [{ "$type": "Integer", "_value": "123" }]}', { $event: 'Record', _body: [{ $type: 'Integer', _value: '123' }]}], 
+            ['{ "$event": "Record", "_body": [] }', { $event: 'Record', _body: []}]
+        ]
+    }
+
+    function summaries(): [string, SummaryEvent][] {
+        return [
+            ['{ "$event": "Summary", "_body": { "bookmarks": ["bm1", "bm2"] } }', { $event: 'Summary', _body: { bookmarks: ['bm1', 'bm2'] } }],
+            ['{ "$event": "Summary", "_body": {} }', { $event: 'Summary', _body: {} }]
+        ]
+    }
+
+    function errors(): [string, ErrorEvent][] {
+        return [
+            ['{ "$event": "Error", "_body": [{ "code": "Neo.Made.Up.Error", "message": "the error message"}, { "code": "Neo.Made.Up.Error2", "message": "the error message 2"}]}', { $event: 'Error', _body: [ { code: 'Neo.Made.Up.Error', message: 'the error message'}, { code: 'Neo.Made.Up.Error2', message: 'the error message 2'} ] }],
+            ['{ "$event": "Error", "_body": [{ "code": "Neo.Made.Up.Error", "message": "the error message"}]}', { $event: 'Error', _body: [ { code: 'Neo.Made.Up.Error', message: 'the error message'} ] }], 
+            ['{ "$event": "Error", "_body": [] }', { $event: 'Error', _body: [] }]
+        ]
+    }
+
+    function invalidEvents(): [string][] {
+        return [
+            ['null'],
+            ['"string"'],
+            ['1'],
+            ["{}"],
+            ['{ "_body": {} }'],
+            ['{ "$event": "Summary }'],
+            ['{ "$event": "Summary, "_body": "string" }'],
+            ['{ "$event": "Summary, "_body": 123 }'],
+            ['{ "$event": 1, "_body": {} }'],
+            ['{ "$event": "Summary", "body": {} }'],
+            ['{ "event": "Summary", "_body": {} }']
         ]
     }
 
