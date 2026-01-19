@@ -172,7 +172,7 @@ describe('HttpConnectionProvider', () => {
                     expect(returnedError).toBe(error)
                     if (error != null && typeof error === 'object') {
                         // @ts-expect-error
-                        expect(returnedError.retriable).not.toBe(true)
+                        expect(returnedError.retryable).not.toBe(true)
                     }
 
                     expect(spyOnHandleSecurityException).not.toHaveBeenCalled()
@@ -200,7 +200,7 @@ describe('HttpConnectionProvider', () => {
                     expect(returnedError).toBe(error)
                     if (error != null && typeof error === 'object') {
                         // @ts-expect-error
-                        expect(returnedError.retriable).not.toBe(true)
+                        expect(returnedError.retryable).not.toBe(true)
                     }
 
                     expect(spyOnHandleSecurityException).not.toHaveBeenCalled()
@@ -210,14 +210,14 @@ describe('HttpConnectionProvider', () => {
                 }) 
 
                 it.each([
-                    [newError('some retriable error', 'Neo.ClientError.Security.MadeUp'), true],
-                    [newError('some retriable error', 'Neo.ClientError.Security.MadeUp'), false]
-                ])('should treated security error %s when as authManager said', async (error: Error, retriable: boolean) => {
+                    [newError('some retryable error', 'Neo.ClientError.Security.MadeUp'), true],
+                    [newError('some retryable error', 'Neo.ClientError.Security.MadeUp'), false]
+                ])('should treated security error %s when as authManager said', async (error: Error, retryable: boolean) => {
                     const newPool = jest.fn<internal.pool.Pool<HttpConnection>, ConstructorParameters<typeof internal.pool.Pool<HttpConnection>>>()
                     const address = internal.serverAddress.ServerAddress.fromUrl('localhost:7474')
                     const { params: { authTokenManager } } = newProvider(address, { newPool })
                     const spyOnHandleSecurityException = jest.spyOn(authTokenManager, 'handleSecurityException')
-                    spyOnHandleSecurityException.mockImplementation(() => retriable)
+                    spyOnHandleSecurityException.mockImplementation(() => retryable)
                     
                     const [[{ create }]] = newPool.mock.calls
     
@@ -231,7 +231,7 @@ describe('HttpConnectionProvider', () => {
                     const returnedError = errorHandler(error)
                     expect(returnedError).toBe(error)
                     // @ts-expect-error
-                    expect(returnedError.retriable).toBe(retriable)
+                    expect(returnedError.retryable).toBe(retryable)
                 })
             })
         })

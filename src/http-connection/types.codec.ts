@@ -16,6 +16,7 @@
  */
 
 import { Date, DateTime, Duration, Integer, LocalDateTime, LocalTime, Node, Path, PathSegment, Point, Relationship, Time, error, int, internal, isDateTime, isTime, newError, types } from "neo4j-driver-core"
+import { NEO4J_QUERY_CONTENT_TYPE, NEO4J_QUERY_CONTENT_TYPE_V1_0, NEO4J_QUERY_CONTENT_TYPE_V1_0_JSONL } from "./codec"
 
 
 export type RawQueryValueTypes = 'Null' | 'Boolean' | 'Integer' | 'Float' | 'String' |
@@ -55,6 +56,12 @@ export type RawQueryValue = RawQueryNull | RawQueryBoolean | RawQueryInteger | R
     RawQueryOffsetDateTime | RawQueryLocalDateTime | RawQueryDuration | RawQueryPoint |
     RawQueryBinary | RawQueryMap | RawQueryList | RawQueryNode | RawQueryRelationship |
     RawQueryPath
+
+export type RawQueryError = {
+    code: string,
+    message: string
+    error?: string
+}
 
 export type Counters = {
     containsUpdates: boolean
@@ -102,8 +109,10 @@ export type NotificationShape = {
 
 export default class TypedJsonCodec {
     static of(contentType: string, config: types.InternalConfig): TypedJsonCodec {
-        if (contentType === 'application/vnd.neo4j.query.v1.0' || contentType == 'application/vnd.neo4j.query') {
-            return new TypedJsonCodecV10(config)
+        if (contentType === NEO4J_QUERY_CONTENT_TYPE_V1_0_JSONL ||
+            contentType === NEO4J_QUERY_CONTENT_TYPE_V1_0 ||
+            contentType === NEO4J_QUERY_CONTENT_TYPE) {
+                return new TypedJsonCodecV10(config)
         }
 
         throw newError(`Unsupported content type: ${contentType}`)

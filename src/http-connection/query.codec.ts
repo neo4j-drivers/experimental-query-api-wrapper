@@ -15,10 +15,14 @@
  * limitations under the License.
  */
 
-import { newError, Node, Relationship, int, error, types, Integer, Time, Date, LocalTime, Point, DateTime, LocalDateTime, Duration, isInt, isPoint, isDuration, isLocalTime, isTime, isDate, isLocalDateTime, isDateTime, isRelationship, isPath, isNode, isPathSegment, Path, PathSegment, internal, isUnboundRelationship, isVector } from "neo4j-driver-core"
+import { newError, int, error, types, isInt, isPoint, isDuration, isLocalTime, isTime, isDate, isLocalDateTime, isDateTime, isRelationship, isPath, isNode, isPathSegment, isUnboundRelationship, isVector } from "neo4j-driver-core"
 import { RunQueryConfig } from "neo4j-driver-core/types/connection"
-import { NEO4J_QUERY_CONTENT_TYPE, encodeAuthToken, encodeTransactionBody } from "./codec"
-import TypedJsonCodec, { Counters, NotificationShape, ProfiledQueryPlan, RawQueryValue } from "./types.codec"
+import { NEO4J_QUERY_CONTENT_TYPE, NEO4J_QUERY_CONTENT_TYPE_V1_0_JSONL, encodeAuthToken, encodeTransactionBody } from "./codec"
+import TypedJsonCodec, { Counters, NotificationShape, ProfiledQueryPlan, RawQueryValue, RawQueryError } from "./types.codec"
+import { Event, HeaderEvent, QueryApiEventTransformer, SummaryEvent } from "./event.codec"
+import { TransformStream } from "stream/web"
+import { TextDecoderStream } from "node:stream/web"
+import LineTransformer from "./lang/line.transformer"
 
 
 export type RawQueryData = {
@@ -36,12 +40,6 @@ export type RawQuerySuccessResponse = {
     [str: string]: unknown
 }
 
-export type RawQueryError = {
-    code: string,
-    message: string
-    error?: string
-}
-
 
 export type RawQueryFailuresResponse = {
     errors: RawQueryError[]
@@ -50,6 +48,37 @@ export type RawQueryFailuresResponse = {
 export type RawQueryResponse = RawQuerySuccessResponse | RawQueryFailuresResponse
 
 export class QueryResponseCodec {
+
+    static async ofResponse(
+        config: types.InternalConfig,
+        url: String,
+        response: Response
+        ): Promise<QueryResponseCodec> {
+
+        const contentType = response.headers.get('Content-Type') ?? ''
+
+        if (contentType === NEO4J_QUERY_CONTENT_TYPE_V1_0_JSONL) {
+            const decoder = new TextDecoderStream();
+            const it = response.body?.pipeThrough(decoder)
+                .pipeThrough(new TransformStream(new LineTransformer()))
+                .pipeThrough(new TransformStream(new QueryApiEventTransformer()))
+                .values()!;
+
+            
+            return new QueryJsonlResponseCodec(
+                TypedJsonCodec.of(contentType, config),
+                it
+            )
+        }
+
+        try {
+            const text = await response.text()
+            const body = text !== '' ? JSON.parse(text) : {};
+            return QueryResponseCodec.of(config, contentType, body);
+        } catch (error) {
+            throw newError(`Failure accessing "${url}"`, 'SERVICE_UNAVAILABLE', error)
+        }
+    }
 
     static of(
         config: types.InternalConfig,
@@ -75,10 +104,6 @@ export class QueryResponseCodec {
             newError('Server replied an empty error response', error.PROTOCOL_ERROR))
     }
 
-    get error(): Promise<undefined> | Error | undefined {
-        throw new Error('Not implemented')
-    }
-
     get keys(): string[] | Promise<string[]> {
         throw new Error('Not implemented')
     }
@@ -98,10 +123,6 @@ class QuerySuccessResponseCodec extends QueryResponseCodec {
         private readonly _typedJsonCodec: TypedJsonCodec,
         private readonly _response: RawQuerySuccessResponse) {
         super()
-    }
-
-    get error(): Error | undefined {
-        return undefined
     }
 
     get keys(): string[] {
@@ -132,13 +153,134 @@ class QuerySuccessResponseCodec extends QueryResponseCodec {
 
 }
 
+class QueryJsonlResponseCodec extends QueryResponseCodec {
+    private _keys: string[]
+    private _error: Error | undefined
+    private _meta: Record<string, unknown>
+    private _done: boolean
+
+    constructor(
+        private readonly _typedJsonCodec: TypedJsonCodec,
+        private readonly _it: AsyncIterableIterator<Event> ) {
+            super()
+            this._done = false
+    }
+
+    get keys(): Promise<string[]> | string[] {
+        if (this._error) {
+            return Promise.reject(error)
+        }
+        if (this._keys != null) {
+            return this._keys
+        }
+        return this._next()
+            .then(event => {
+                if (event == null || event.$event !== 'Header') {
+                    throw newError(`Streaming ordering violation. Expected Header, got: ${event?.$event}`, error.PROTOCOL_ERROR)
+                }
+
+                this._processHeader(event)
+
+                return this._keys
+            })
+    }
+
+    private _processHeader (event: HeaderEvent) {
+        if (event._body.fields == null) {
+            throw newError(`Expected Header event for streaming query to have non null keys.`, error.PROTOCOL_ERROR)
+        }
+        this._keys = event._body.fields
+    }
+
+    get meta(): Promise<Record<string, unknown>> | Record<string, unknown> {
+        if (this._error) {
+            return Promise.reject(error)
+        }
+        if (this._meta != null) {
+            return this._meta
+        }
+
+        return this._next()
+            .then(event => {
+                if (event == null) {
+                    throw newError(`Streaming ordering violation. Expected Header, got: ${event}`, error.PROTOCOL_ERROR)
+                }
+
+                if (event.$event !== 'Summary') {
+                    if (event.$event === 'Header') {
+                        this._processHeader(event)
+                    }
+                    // next
+                    return this.meta
+                }
+
+                this._processSummary(event)
+                return this._meta
+            })
+    }
+
+    private _processSummary(event: SummaryEvent) {
+        this._meta = {
+            bookmark: event._body.bookmarks,
+            stats: event._body.counters != null ? this._typedJsonCodec.decodeStats(event._body.counters) : null,
+            profile: event._body.profiledQueryPlan != null ?
+                this._typedJsonCodec.decodeProfile(event._body.profiledQueryPlan) : null,
+            plan: event._body.queryPlan != null ?
+                this._typedJsonCodec.decodeProfile(event._body.queryPlan) : null,
+            notifications: event._body.notifications
+        }
+    }
+
+    async *stream(): AsyncGenerator<any[]> { 
+        if (this._error) {
+            throw this._error
+        }
+        while(!this._done) {
+            const event = await this._next()
+            if (this._done) {
+                return;
+            }
+
+            if (event?.$event === 'Header') {
+                this._processHeader(event)
+            } else if(event?.$event === 'Record') {
+                yield event._body.map(this._typedJsonCodec.decodeValue.bind(this._typedJsonCodec))
+            } else if(event?.$event === 'Summary') {
+                this._processSummary(event)
+            } else {
+                this._error = newError(`${event?.$event} is not expected`, error.PROTOCOL_ERROR)
+                throw this._error
+            }
+        }
+        return
+    }
+
+    private async _next(): Promise<Event | undefined> {
+        if (this._done) {
+            throw newError("Closed streaming.", error.PROTOCOL_ERROR)
+        }
+        const { value: event, done } = await this._it.next() as { value: Event, done: boolean }
+        this._done = done === true
+        if (this._done) {
+            return event
+        }
+
+        if (event.$event === 'Error') {
+            this._error = event._body.length > 0 ? newError(
+                event._body[0].message,
+                // TODO: REMOVE THE ?? AND .ERROR WHEN SERVER IS FIXED
+                event._body[0].code
+            ) : newError('Server replied an empty error response', error.PROTOCOL_ERROR)
+            throw this._error
+        } 
+
+        return event
+    }
+}
+
 class QueryFailureResponseCodec extends QueryResponseCodec {
     constructor(private readonly _error: Error) {
         super()
-    }
-
-    get error(): Error | undefined {
-        return this._error
     }
 
     get keys(): string[] {
@@ -182,7 +324,7 @@ export class QueryRequestCodec {
     }
 
     get accept(): string {
-        return `${NEO4J_QUERY_CONTENT_TYPE}, application/json`
+        return `${NEO4J_QUERY_CONTENT_TYPE_V1_0_JSONL}, ${NEO4J_QUERY_CONTENT_TYPE}, application/json`
     }
 
     get authorization(): string {

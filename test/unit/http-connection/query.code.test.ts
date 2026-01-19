@@ -31,10 +31,10 @@ describe('QueryRequestCodec', () => {
     })
 
     describe('.accept', () => {
-        it('should return "application/vnd.neo4j.query, application/json"', () => {
+        it('should return "application/vnd.neo4j.query.v1.0+jsonl, application/vnd.neo4j.query, application/json"', () => {
             const codec = subject()
 
-            expect(codec.accept).toBe('application/vnd.neo4j.query, application/json')
+            expect(codec.accept).toBe('application/vnd.neo4j.query.v1.0+jsonl, application/vnd.neo4j.query, application/json')
         })
     })
 
@@ -291,58 +291,6 @@ describe('QueryResponseCodec', () => {
             "FB:kcwQUln6E/U2SUyIXRY1rTIt8wKQ"
         ]
     }
-
-    describe('.error', () => {
-        it('should handle success', () => {
-            const codec = subject()
-
-            expect(codec.error).toBe(undefined)
-        })
-
-        it('should handle failures', () => {
-            const codec = subject({
-                rawQueryResponse: {
-                    errors: [{
-                        message: 'Something wrong is mighty right',
-                        code: 'Neo.ClientError.Made.Up'
-                    }]
-                }
-            })
-
-            expect(codec.error).toBeDefined()
-            // @ts-expect-error 
-            expect(codec.error?.message).toEqual('Something wrong is mighty right')
-            // @ts-expect-error
-            expect(codec.error?.code).toEqual('Neo.ClientError.Made.Up')
-
-        })
-
-        it('should handle empty error list', () => {
-            const codec = subject({
-                rawQueryResponse: {
-                    errors: []
-                }
-            })
-
-            expect(codec.error).toBeDefined()
-            // @ts-expect-error
-            expect(codec.error?.message).toEqual('Server replied an empty error response')
-            // @ts-expect-error
-            expect(codec.error?.code).toEqual('ProtocolError')
-        })
-
-        it('should consider wrong content type as ProtocolError', () => {
-            const codec = subject({
-                contentType: 'application/json'
-            })
-
-            expect(codec.error).toBeDefined()
-            // @ts-expect-error
-            expect(codec.error?.message).toEqual('Wrong content-type. Expected "application/vnd.neo4j.query", but got "application/json".')
-            // @ts-expect-error
-            expect(codec.error?.code).toEqual('ProtocolError')
-        })
-    })
 
     describe('.keys', () => {
         it.each([
