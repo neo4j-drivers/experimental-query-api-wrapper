@@ -11,10 +11,12 @@
     "outDir": "lib",
     "declaration": true,
     "declarationDir": "types",
-    "isolatedModules": true
+    "isolatedModules": true,
+    "allowJs": true,
   },
   "include": [
     "src/**/*.ts",
+    "src/**/*.js",
     "test/**/*.ts"
   ]
 }

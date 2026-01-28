@@ -25,6 +25,9 @@
     "neo4j",
     "driver"
   ],
+  "browser": {
+    "./lib/http-connection/node/stream.js": "./lib/http-connection/browser/stream.js"
+  },
   "author": "Neo4j",
   "contributors": [
     {
