@@ -19,10 +19,8 @@ import { RunQueryConfig } from "neo4j-driver-core/types/connection"
 import { NEO4J_QUERY_CONTENT_TYPE, NEO4J_QUERY_CONTENT_TYPE_V1_0_JSONL, encodeAuthToken, encodeTransactionBody } from "./codec"
 import TypedJsonCodec, { Counters, NotificationShape, ProfiledQueryPlan, RawQueryValue, RawQueryError } from "./types.codec"
 import { Event, HeaderEvent, QueryApiEventTransformer, SummaryEvent } from "./event.codec"
-import { TransformStream } from "stream/web"
-import { TextDecoderStream } from "node:stream/web"
+import { TransformStream, TextDecoderStream } from "./node/stream"
 import LineTransformer from "./lang/line.transformer"
-
 
 export type RawQueryData = {
     fields: string[]

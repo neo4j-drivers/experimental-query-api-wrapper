@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { TransformStreamDefaultController, Transformer } from "stream/web";
+import { TransformStreamDefaultController, Transformer } from "./node/stream";
 import { newError, error } from "neo4j-driver-core";
 import { Counters, NotificationShape, ProfiledQueryPlan, RawQueryError, RawQueryValue } from "./types.codec";
 
