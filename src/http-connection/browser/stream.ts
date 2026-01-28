@@ -15,6 +15,9 @@
  * limitations under the License.
  */
 
-import { TransformStream, TextDecoderStream, TransformStreamDefaultController, Transformer } from "stream/web"
-export { TransformStream, TextDecoderStream, TransformStreamDefaultController }
-export type {Transformer}
+// @ts-ignore
+export const TransformStream = window.TransformStream
+// @ts-ignore
+export const TextDecoderStream = window.TextDecoderStream
+// @ts-ignore
+export const TransformStreamDefaultController = window.TransformStreamDefaultController
