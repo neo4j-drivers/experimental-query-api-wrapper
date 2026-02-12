@@ -1,3 +1,4 @@
+"use strict";
 /**
  * Copyright (c) "Neo4j"
  * Neo4j Sweden AB [https://neo4j.com]
@@ -14,10 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+Object.defineProperty(exports, "__esModule", { value: true });
 
-// @ts-ignore
-export const TransformStream = window.TransformStream
-// @ts-ignore
-export const TextDecoderStream = window.TextDecoderStream
-// @ts-ignore
-export const TransformStreamDefaultController = window.TransformStreamDefaultController
+exports.TransformStream = TransformStream;
+exports.TextDecoderStream = TextDecoderStream;
+exports.TransformStreamDefaultController = TransformStreamDefaultController;
