@@ -337,12 +337,12 @@ export default class HttpConnection extends Connection {
         return this._queryEndpoint.replace('{databaseName}', database) + '/tx'
     }
 
-    static async discover({ scheme, address }: { scheme: HttpScheme, address: internal.serverAddress.ServerAddress }): Promise<{
+    static async discover({ scheme, address, path }: { scheme: HttpScheme, address: internal.serverAddress.ServerAddress, path?: string }): Promise<{
         query: string
         version: string
         edition: string
     }> {
-        return await fetch(`${scheme}://${address.asHostPort()}`, {
+        return await fetch(`${scheme}://${address.asHostPort()}${path ?? ''}`, {
             headers: {
                 Accept: 'application/json',
             }
