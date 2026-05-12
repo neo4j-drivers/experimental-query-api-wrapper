@@ -16,7 +16,6 @@
  */
 
 import { auth } from 'neo4j-driver-core'
-import { HttpConnectionProvider } from '../../src/http-connection'
 import { wrapper } from '../../src'
 
 let capturedConfigs: any[] = []
