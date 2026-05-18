@@ -325,6 +325,71 @@ describe('HttpConnectionProvider', () => {
         })
     })
 
+    describe('URL path handling', () => {
+        it('should include path in _queryEndpoint when provided', () => {
+            const address = internal.serverAddress.ServerAddress.fromUrl('localhost:7474')
+            const { provider } = newProvider(address, { newPool: jest.fn() }, { path: '/my-proxy' })
+
+            // @ts-expect-error
+            expect(provider._queryEndpoint).toBe('http://localhost:7474/my-proxy/db/{databaseName}/query/v2')
+        })
+
+        it('should not alter _queryEndpoint when path is empty', () => {
+            const address = internal.serverAddress.ServerAddress.fromUrl('localhost:7474')
+            const { provider } = newProvider(address, { newPool: jest.fn() })
+
+            // @ts-expect-error
+            expect(provider._queryEndpoint).toBe('http://localhost:7474/db/{databaseName}/query/v2')
+        })
+
+        it('should not alter _queryEndpoint when path is undefined', () => {
+            const address = internal.serverAddress.ServerAddress.fromUrl('localhost:7474')
+            const { provider } = newProvider(address, { newPool: jest.fn() }, { path: undefined })
+
+            // @ts-expect-error
+            expect(provider._queryEndpoint).toBe('http://localhost:7474/db/{databaseName}/query/v2')
+        })
+
+        it('should include deep path in _queryEndpoint', () => {
+            const address = internal.serverAddress.ServerAddress.fromUrl('localhost:7474')
+            const { provider } = newProvider(address, { newPool: jest.fn() }, { path: '/deep/nested/path' })
+
+            // @ts-expect-error
+            expect(provider._queryEndpoint).toBe('http://localhost:7474/deep/nested/path/db/{databaseName}/query/v2')
+        })
+
+        it('should propagate path in queryEndpoint to created connections', async () => {
+            const newPool = jest.fn<internal.pool.Pool<HttpConnection>, ConstructorParameters<typeof internal.pool.Pool<HttpConnection>>>()
+            const address = internal.serverAddress.ServerAddress.fromUrl('localhost:7474')
+            newProvider(address, { newPool }, { path: '/my-proxy' })
+
+            const [[{ create }]] = newPool.mock.calls
+            const connection = await create!({ queryEndpoint: 'http://localhost:7474/my-proxy/db/{databaseName}/query/v2' }, address, async () => {})
+
+            // @ts-expect-error
+            expect(connection._queryEndpoint).toBe('http://localhost:7474/my-proxy/db/{databaseName}/query/v2')
+        })
+
+        it('should pass path to discover() in verifyConnectivityAndGetServerInfo', async () => {
+            const address = internal.serverAddress.ServerAddress.fromUrl('localhost:7474')
+            const { newHttpConnection, discoverSpy, spyOnRunners, spyOnRelease } = setupSpies(address)
+            const { provider, params: { scheme } } = newProvider(address, { newHttpConnection }, { path: '/my-proxy' })
+            const expectedQueryApi = `${scheme}://${address.asHostPort()}/my-proxy/db/{databaseName}/query/v2`
+
+            discoverSpy.mockResolvedValue({
+                query: expectedQueryApi,
+                version: '5.19.0',
+                edition: 'enterprise'
+            })
+
+            await provider.verifyConnectivityAndGetServerInfo({ database: 'neo4j', accessMode: 'READ' })
+
+            expect(discoverSpy).toHaveBeenCalledWith(expect.objectContaining({
+                path: '/my-proxy'
+            }))
+        })
+    })
+
     describe('.supportsMultiDb()', () => {
         it ('should resolves true', async () => {
             const address = internal.serverAddress.ServerAddress.fromUrl('localhost:7474')
@@ -718,14 +783,15 @@ function setupSpies(address: internal.serverAddress.ServerAddress, spies?: {
     return { newHttpConnection, discoverSpy, spyOnRunners, spyOnRelease }
 }
 
-function newProvider(address: internal.serverAddress.ServerAddress, injectable?: Partial<HttpConnectionProviderInjectable>) {
+function newProvider(address: internal.serverAddress.ServerAddress, injectable?: Partial<HttpConnectionProviderInjectable>, extra?: { path?: string }) {
     const params = {
         address,
         authTokenManager: staticAuthTokenManager({ authToken: auth.basic('neo4j', 'password ') }),
         config: { encrypted: false },
         id: 1,
         scheme: 'http' as HttpScheme,
-        log: new internal.logger.Logger('debug', () => { })
+        log: new internal.logger.Logger('debug', () => { }),
+        ...(extra?.path !== undefined ? { path: extra.path } : {})
     }
     
     return { provider :new HttpConnectionProvider(params, {

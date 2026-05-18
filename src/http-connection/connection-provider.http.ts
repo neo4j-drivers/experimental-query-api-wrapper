@@ -71,6 +71,7 @@ export default class HttpConnectionProvider extends ConnectionProvider {
     private _scheme: HttpScheme
     private _authTokenManager: AuthTokenManager
     private _config: types.InternalConfig
+    private _path: string
     private _queryEndpoint?: string
     private _openConnections: { [n: number]: HttpConnection }
     private _pool: internal.pool.Pool<HttpConnection>
@@ -87,8 +88,9 @@ export default class HttpConnectionProvider extends ConnectionProvider {
         this._scheme = config.scheme
         this._authTokenManager = config.authTokenManager
         this._config = config.config
+        this._path = config.path ?? ''
         this._openConnections = {}
-        this._queryEndpoint = `${this._scheme}://${this._address.asHostPort()}/db/{databaseName}/query/v2`
+        this._queryEndpoint = `${this._scheme}://${this._address.asHostPort()}${this._path}/db/{databaseName}/query/v2`
         this._newHttpConnection = newHttpConnection
         this._pool = newPool({
             create: this._createConnection.bind(this),
@@ -106,7 +108,7 @@ export default class HttpConnectionProvider extends ConnectionProvider {
 
 
     async verifyConnectivityAndGetServerInfo(param: { database: string; accessMode?: string | undefined } | undefined): Promise<ServerInfo> {
-        const discoveryInfo = await HttpConnection.discover({ scheme: this._scheme, address: this._address })
+        const discoveryInfo = await HttpConnection.discover({ scheme: this._scheme, address: this._address, path: this._path })
 
         // @ts-expect-error sending unexpected data
         const connection = await this._pool.acquire({ queryEndpoint: this._queryEndpoint }, this._address)

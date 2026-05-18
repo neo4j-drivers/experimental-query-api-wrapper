@@ -147,6 +147,7 @@ function wrapper (
 ): Wrapper {
   assertString(url, 'Http URL')
   const parsedUrl = urlUtil.parseDatabaseUrl(url)
+  const path = extractPath(url as string)
 
   // enabling set boltAgent
   const _config = config as unknown as InternalConfig
@@ -206,12 +207,26 @@ function wrapper (
         authTokenManager,
         scheme: parsedUrl.scheme as unknown as 'http' | 'https',
         address,
+        path,
         userAgent: config.userAgent,
         boltAgent: config.boltAgent,
         routingContext: parsedUrl.query
       })
     
   }
+}
+
+function extractPath (url: string): string {
+  const withoutScheme = url.replace(/^https?:\/\//, '')
+  const pathStart = withoutScheme.indexOf('/')
+  if (pathStart === -1) {
+    return ''
+  }
+  const raw = withoutScheme.substring(pathStart)
+  const withoutQuery = raw.split('?')[0]
+  const withoutFragment = withoutQuery.split('#')[0]
+  const trimmed = withoutFragment.replace(/\/+$/, '')
+  return trimmed
 }
 
 
