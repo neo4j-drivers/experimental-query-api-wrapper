@@ -21,6 +21,7 @@ import TypedJsonCodec, { Counters, NotificationShape, ProfiledQueryPlan, RawQuer
 import { Event, HeaderEvent, QueryApiEventTransformer, SummaryEvent } from "./event.codec"
 import { TransformStream, TextDecoderStream } from "./node/stream"
 import LineTransformer from "./lang/line.transformer"
+import "./polyfills/async-iterable-readable-stream"
 
 export type RawQueryData = {
     fields: string[]

@@ -17,6 +17,7 @@
   "include": [
     "src/**/*.ts",
     "test/**/*.ts",
-    "src/http-connection/browser/stream.js"  
-]
+    "src/http-connection/browser/stream.js", 
+    "src/http-connection/polyfills/async-iterable-readable-stream.js"
+  ]
 }
