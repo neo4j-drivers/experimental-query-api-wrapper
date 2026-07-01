@@ -2,8 +2,10 @@
  * A polyfill for `ReadableStream.protototype[Symbol.asyncIterator]`,
  * aligning as closely as possible to the specification.
  *
+ * @author @MattiasBuelens
  * @see https://streams.spec.whatwg.org/#rs-asynciterator
  * @see https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream#async_iteration
+ * @see https://gist.github.com/MattiasBuelens/496fc1d37adb50a733edd43853f2f60e 
  */
 ReadableStream.prototype.values ??= function({ preventCancel = false } = {}) {
   const reader = this.getReader();
