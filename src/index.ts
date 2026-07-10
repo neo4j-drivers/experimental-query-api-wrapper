@@ -96,6 +96,7 @@ import { logging } from './logging'
 import { HttpUrl, Wrapper, WrapperSession, WrapperConfig, WrapperSessionConfig } from './types'
 import { WrapperImpl } from './wrapper.impl'
 import { HttpConnectionProvider } from './http-connection'
+import "@sec-ant/readable-stream/polyfill/asyncIterator";
 
 
 const {

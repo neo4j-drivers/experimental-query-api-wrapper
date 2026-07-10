@@ -557,6 +557,11 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
+"@sec-ant/readable-stream@^0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@sec-ant/readable-stream/-/readable-stream-0.7.0.tgz#424a7c2d49f98c23e47f981862d8b2bb47912fe3"
+  integrity sha512-eeflyrQR+jQaliaTcC2R+EG+JkPZpCHbpTN8w0K5LhhXzrI0XmES9CPt6uF4u/Gc4PUafaBzq4dj5WLvQ/YnsA==
+
 "@sinclair/typebox@^0.27.8":
   version "0.27.8"
   resolved "https://registry.npmjs.org/@sinclair/typebox/-/typebox-0.27.8.tgz"
