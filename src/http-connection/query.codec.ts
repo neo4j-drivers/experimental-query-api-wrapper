@@ -321,7 +321,14 @@ export class QueryRequestCodec {
     }
 
     get accept(): string {
-        return `${NEO4J_QUERY_CONTENT_TYPE_V1_0_JSONL}, ${NEO4J_QUERY_CONTENT_TYPE}, application/json`
+        // @ts-expect-error
+        if (ReadableStream.prototype.values == null) {
+            //older versions of Safari (until Safari 27) don't support async iteration of ReadableStreams, which we need for this
+            return `${NEO4J_QUERY_CONTENT_TYPE}, application/json`
+        }
+        else {
+            return `${NEO4J_QUERY_CONTENT_TYPE_V1_0_JSONL}, ${NEO4J_QUERY_CONTENT_TYPE}, application/json`
+        }
     }
 
     get authorization(): string {
