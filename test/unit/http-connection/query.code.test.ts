@@ -212,31 +212,22 @@ describe('QueryRequestCodec', () => {
             expect(() => codec.body).toThrow('Graph types can not be ingested to the server')
         })
 
-        it('should not handle UnsupportedType as parameters ', () => {
-            const param = new UnsupportedType("Vector", 6, 0, "Something good is bad, actually!")
-            const codec = subject({
-                parameters: {
-                    param
-                }
-            })
-
-            expect(() => codec.body).toThrow('UnsupportedType can not be ingested to the server')
-        })
-
         it.each([
-            ['Vector<INT8>', new Vector(new Int8Array([-127, 0, 128]))],
-            ['Vector<INT16>', new Vector(new Int16Array([-1273, 0, 1283]))],
-            ['Vector<INT32>', new Vector(new Int32Array([-1273, 0, 1283]))],
-            ['Vector<INT64>', new Vector(new BigInt64Array([BigInt(-1273), BigInt(0), BigInt(1283)]))],
-            ['Vector<FLOAT32>', new Vector(new Float32Array([-1273.13, 0, 1283.34]))],
-            ['Vector<FLOAT64>', new Vector(new Float64Array([-1273.123, 0, 1283]))]
-        ])('should not support (%) as parameter', (_, param) => {
+            ['UnsupportedType', new UnsupportedType("Vector", 6, 0, "Something good is bad, actually!"), 'UnsupportedType can not be ingested to the server'],
+            ['Vector<INT8>', new Vector(new Int8Array([-127, 0, 128])), 'Vectors are not supported yet on query api'],
+            ['Vector<INT16>', new Vector(new Int16Array([-1273, 0, 1283])), 'Vectors are not supported yet on query api'],
+            ['Vector<INT32>', new Vector(new Int32Array([-1273, 0, 1283])), 'Vectors are not supported yet on query api'],
+            ['Vector<INT64>', new Vector(new BigInt64Array([BigInt(-1273), BigInt(0), BigInt(1283)])), 'Vectors are not supported yet on query api'],
+            ['Vector<FLOAT32>', new Vector(new Float32Array([-1273.13, 0, 1283.34])), 'Vectors are not supported yet on query api'],
+            ['Vector<FLOAT64>', new Vector(new Float64Array([-1273.123, 0, 1283])), 'Vectors are not supported yet on query api'],
+            ['UUID', neo4j.uuid("550e8400-e29b-41d4-a716-446655440000"), 'UUIDs are not supported yet on query api']
+        ])('should not support (%) as parameter', (_, param, error) => {
             const codec = subject({
                 parameters: {
                     param
                 }
             })
-            expect(() => codec.body).toThrow('Vectors are not supported yet on query api')
+            expect(() => codec.body).toThrow(error)
         })
 
     })
